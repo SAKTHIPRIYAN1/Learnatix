@@ -1,0 +1,1 @@
+This is the App called Quizzy. This utilizes gen AI and generate the Quizz in real time.
