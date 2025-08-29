@@ -1,10 +1,11 @@
 
 import React from 'react';
-import CenterBlur from './_components/CenterBlur';
-import Login from './_components/LoginForm';
+import CenterBlur from '@/_components/utilsComponents/CenterBlur';
+import Login from '@/_components/utilsComponents/LoginForm';
 import Image from 'next/image';
 
-const HomePage = () => {
+const HomePage = async () => {
+  
   return (
     <div className=" h-[100vh] w-[100vw] bg-[rgb(3,8,22)] flex items-center justify-center">
       <CenterBlur />
@@ -15,7 +16,7 @@ const HomePage = () => {
         width={550}          // Desired width
         height={400}         // Desired height
       />
-
+      
       <Login />
     </div>
   );

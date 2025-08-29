@@ -1,7 +1,7 @@
 import React from 'react';
-import CenterBlur from './_components/CenterBlur';
+import CenterBlur from '../_components/utilsComponents/CenterBlur';
 import Link from 'next/link';
-import BubblesBackground from './_components/bubb';
+import BubblesBackground from '../_components/utilsComponents/bubb';
 
     
 export default function NotFound() {
