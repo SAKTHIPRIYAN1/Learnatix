@@ -16,10 +16,10 @@ export default function DashboardClient() {
     console.log("User role:", user?.unsafeMetadata.role); // Debug log
 
     if(user?.unsafeMetadata.role === "TEACHER"){
-      router.push("/dashboard/teacher");
+      router.push("/dashboard/teacher/classroom");
     }
     else if(user?.unsafeMetadata.role === "STUDENT"){
-      router.push("/dashboard/student");
+      router.push("/dashboard/student/classroom");
     }
     else{
       router.push("/");

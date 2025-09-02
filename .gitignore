@@ -41,6 +41,9 @@
 **/prisma/migrations/
 **/src/prisma/
 
+# local uploadsss....
+**/uploads
+
 # vercel
 **/.vercel
 

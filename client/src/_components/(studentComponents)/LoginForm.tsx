@@ -6,8 +6,8 @@ import * as SignIn from "@clerk/elements/sign-in";
 import { ClerkLoaded, ClerkLoading } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import TeacherIcon from "./TeacherIcon";
-import ArrowIcon from "./sgn";
+import TeacherIcon from "../(Icons)/TeacherIcon";
+import ArrowIcon from "../utilsComponents/sgn";
 
 const Login = () => {
   const router = useRouter();

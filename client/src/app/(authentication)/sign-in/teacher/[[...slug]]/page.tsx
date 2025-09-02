@@ -1,7 +1,7 @@
 
 import React from 'react';
 import CenterBlur from '@/_components/utilsComponents/CenterBlur';
-import TeacherLogin from '@/_components/utilsComponents/teacherLogin';
+import TeacherLogin from '@/_components/(teacherComponents)/teacherLogin';
 import Image from 'next/image';
 
 const HomePage = () => {

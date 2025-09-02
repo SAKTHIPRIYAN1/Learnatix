@@ -3,13 +3,19 @@ import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import IconLogout from "../(Icons)/logOutIcon";
-import { useClerk } from '@clerk/nextjs'
+import { useClerk } from '@clerk/nextjs';
+
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
+
+// store!!!
+import { useAppDispatch, useAppSelector } from "@/store/hook";
+import { setName } from "@/store/slices/usesrSlice";
+
 type UserType = {
-  clerkId: string;
-  name: string;
+  clerkId: string ;
+  name: string | null;
   email: string;
   imageUrl: string;
   role: "STUDENT" | "TEACHER" |"";
@@ -17,36 +23,26 @@ type UserType = {
 
 
 const SideBarFooter = () => {
-
-  const {signOut} =useClerk();
+  const {signOut} = useClerk();
   const { isLoaded, user } = useUser();
+  const dispatch=useAppDispatch();
+  const userName=useAppSelector((store)=>store.user.name);
   const [currentUser, setCurrentUser] = useState<UserType | null>(null);
 
   useEffect(() => {
     if (!isLoaded || !user) return;
 
     const fetchUser = async () => {
-      const baseUser: UserType = {
+
+      console.log("Fetching user data for:", user);
+      
+      setCurrentUser({
         clerkId: user.id,
-        name: user.fullName || "",
+        name: userName,
         email: user.emailAddresses[0]?.emailAddress || "",
         imageUrl: user.imageUrl || "",
-        role: "",
-      };
-
-      try {
-        const res = await axios.get(`${API_URL}/users/${user.id}`);
-        const data = res.data as { name?: string, role?: "STUDENT" | "TEACHER" | "" };
-        console.log("Fetched user data:", data);
-        setCurrentUser({
-          ...baseUser,
-          name: data.name ?? baseUser.name,
-          role: data.role ?? baseUser.role,
-        });
-      } catch (err) {
-        console.error("Failed to fetch user:", err);
-        setCurrentUser(baseUser);
-      }
+        role: "STUDENT",
+      });
     };
 
     fetchUser();
@@ -81,7 +77,7 @@ const SideBarFooter = () => {
         <div className="w-full flex justify-between pr-4">
             <div className=" mt-[-3px] flex-col text-sm">
             <h1 >
-                {currentUser.name}
+                {userName}
             </h1>
             <h1 className="text-gray-500 text-[12px] font-medium  overflow-clip  ">
                 {currentUser.role}

@@ -5,11 +5,12 @@ import * as Clerk from "@clerk/elements/common";
 import * as SignIn from "@clerk/elements/sign-in";
 
 
-import ArrowIcon from "./sgn";
+import ArrowIcon from "../utilsComponents/sgn";
 import Link from 'next/link';
-import PencilIcon from './pencilIcon';
+import PencilIcon from '../(Icons)/pencilIcon';
 import { useRouter } from "next/navigation";
 import { ClerkLoaded, ClerkLoading } from "@clerk/nextjs";
+
 
 const TeacherLogin = () => {
   const router = useRouter();

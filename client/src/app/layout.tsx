@@ -8,6 +8,12 @@ import {
   ClerkProvider,
 } from '@clerk/nextjs'
 
+// store!!!
+import Providers from "@/store/provider";
+
+// toasster
+import { Toaster } from "react-hot-toast";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,7 +47,45 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${roboto.variable} antialiased`}
       >
-        {children}
+        <Providers>
+          {children}
+          <Toaster
+              position="bottom-right"
+              toastOptions={{
+                // Default styles for all toasts
+                style: {
+                  background: "rgb(3,8,22)", // slate-800
+                  color: "#f8fafc", // slate-50
+                  borderRadius: "12px",
+                  padding: "10px 10px",
+                  fontSize: "13px",
+                  border: "1px solid #334155", // slate-700
+                },
+
+                // Success-specific
+                success: {
+                  style: {
+                    color: "#ecfdf5",
+                  },
+                  iconTheme: {
+                    primary: "#10b981", // emerald
+                    secondary: "#fff",
+                  },
+                },
+
+                // Error-specific
+                error: {
+                  style: {
+                    color: "#fee2e2",
+                  },
+                  iconTheme: {
+                    primary: "#ef4444", // red
+                    secondary: "#fff",
+                  },
+                },
+              }}
+            />
+        </Providers>
       </body>
     </html>
   </ClerkProvider>

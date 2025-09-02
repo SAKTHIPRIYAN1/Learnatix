@@ -1,14 +1,23 @@
 
-
 "use client";
+import React from 'react';
+import CenterBlur from '../_components/utilsComponents/CenterBlur';
+import Link from 'next/link';
+import BubblesBackground from '../_components/utilsComponents/bubb';
 
+    
 export default function ErrorPage() {
-    return(
-        <h1>
-            Oops!!! Error Found!!
-        </h1>
-    )
+  return (
+    <div className=" z-[2] select-none h-[100vh] w-[100vw] bg-[rgb(3,8,22)] flex items-center justify-center">
+      <CenterBlur />
+      <BubblesBackground />
+      <div className=" z-[3]  border-gray-600  text-secondary flex flex-col items-center justify-center text-center">
+            <h1 className="text-9xl text-primary font-bold ">500</h1>
+            <p className="mt-4 text-7xl ">Oops, Error Occured!</p>
+            <Link href="/" className=" text-blue-500 mt-6 hover:underline">
+                Go back to Home
+            </Link>
+      </div>
+    </div>
+  );
 }
-
-// This is a custom error page for the application.
-// It will be displayed when an error occurs during rendering.

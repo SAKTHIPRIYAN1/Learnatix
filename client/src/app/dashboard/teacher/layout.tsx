@@ -3,12 +3,16 @@ import Sidebar from "@/_components/(commomComponents)/sidebar";
 import Header from "@/_components/(commomComponents)/header";  
 import {IconBell,IconStudent } from "@/_components/(Icons)/Icons";
 import { IconNotebook } from "@/_components/(Icons)/bookIcon";
+import { IconSettings } from "@/_components/(Icons)/Icons";
+import HistoryNavigation from "@/_components/utilsComponents/historyNavigation";
+import CreateClassRoomComp from "@/_components/(teacherComponents)/createClassRoom";
 
 const TeacherDashboardLinks = [
  
   { name: "Classroom", href: "/dashboard/teacher/classroom", icon: <IconStudent /> },
   { name: "Quizzes", href: "/dashboard/teacher/quizzes", icon: <IconNotebook /> },
-  { name: "Notification", href: "/dashboard/teacher/notification", icon: <IconBell /> },
+  { name: "Notifications", href: "/dashboard/teacher/notification", icon: <IconBell /> },
+  {name:"Settings",href:"/dashboard/teacher/classroom",icon:<IconSettings />}
 ];
 
 export default function RootLayout({
@@ -17,12 +21,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex h-screen  relative justify-center items-center bg-black min-w-screen">
+    <div className="flex h-[100vh] relative justify-center items-center bg-black pb-4 min-w-screen">
       <Header />
       <Sidebar DashboardLinks={TeacherDashboardLinks} />
-      <div className="ml-64 w-full pt-32 flex items-center  justify-center h-full">
+      <div className="  ml-60  w-full pt-19 relative bg-[#010108] gap-3 flex-row pl-6 h-full ">
+        <CreateClassRoomComp />
+        <HistoryNavigation />
         {children}
       </div>
+      
     </div>
   );
 }

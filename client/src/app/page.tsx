@@ -1,7 +1,7 @@
 
 import React from 'react';
 import CenterBlur from '@/_components/utilsComponents/CenterBlur';
-import Login from '@/_components/utilsComponents/LoginForm';
+import Login from '@/_components/(studentComponents)/LoginForm';
 import Image from 'next/image';
 
 const HomePage = async () => {

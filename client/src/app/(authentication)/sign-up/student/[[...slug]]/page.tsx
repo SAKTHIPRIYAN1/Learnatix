@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 
 // comp.
-import SignUpForm from '@/_components/utilsComponents/signUpform';
+import SignUpForm from '@/_components/(studentComponents)/signUpform';
 import CenterBlur from '@/_components/utilsComponents/CenterBlur';
 
 const SignUpPage = () => { 

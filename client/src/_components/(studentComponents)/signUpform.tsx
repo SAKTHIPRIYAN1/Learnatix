@@ -1,19 +1,22 @@
 'use client'
 
-import React, { useState } from "react";
-import { useSignUp, useSignIn } from "@clerk/nextjs";
+import React, { useState,useEffect } from "react";
+import { useSignUp, useSignIn,useUser } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Image from "next/image"; 
 import Link from "next/link"; // Use Link for navigation
 import axios from "axios";
 
+import SpinLoader from "../utilsComponents/spinLoader";
 
-import SpinLoader from "./spinLoader";
+import toast from "react-hot-toast";
+
+// this is the sign-up form!!
+// back url;
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-// this is the teacher sign-up form!!
-const SignUpTeacherForm = () => {
+const SignUpForm = () => {
   const { isLoaded, signUp, setActive } = useSignUp();
   const { signIn } = useSignIn(); // for OAuth
   const router = useRouter();
@@ -25,10 +28,12 @@ const SignUpTeacherForm = () => {
   const [code, setCode] = useState("");
   const [error, setError] = useState("");
 
-  const extraData = { role: "TEACHER" };
+  const extraData = { role: "STUDENT" };
 
+  const { isSignedIn, user } = useUser(); //
+
+ 
   if (!isLoaded) return <SpinLoader />;
-  
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,11 +68,11 @@ const SignUpTeacherForm = () => {
         console.log("Username (for DB):", username);
         console.log("Email:", email);
         console.log("Clerk metadata:", extraData);
-        
+
         const clerkId= complete.createdUserId;
         // sending to the backend...
         const res = await axios.post(`${API_URL}/signup`, {
-          name:username,
+          name: username,
           clerkId,
           email,
           role: extraData.role
@@ -76,10 +81,12 @@ const SignUpTeacherForm = () => {
         });
 
         console.log("User data saved to DB:", res.data);
-        router.push("/dashboard");  // redirect after verification
+        toast.success("Account Created Successfully");
+        router.push("/dashboard"); // redirect after verification
       }
     } catch (err: any) {
       console.error(err);
+      toast.error("Error Occured");
       setError(err.errors?.[0]?.message || "Verification failed");
     }
   };
@@ -95,7 +102,7 @@ const SignUpTeacherForm = () => {
           <form onSubmit={handleSignUp} className="flex flex-col w-full gap-4">
             {/* Username */}
             <div className="flex flex-col gap-2">
-              <label className="text-white">TeacherName</label>
+              <label className="text-white">Username</label>
               <input
                 type="text"
                 value={username}
@@ -113,7 +120,7 @@ const SignUpTeacherForm = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="teacher@email.com"
+                placeholder="your@email.com"
                 required
                 className="pl-4 bg-[rgb(3,7,20)] placeholder:text-secondary text-primary outline-none focus:ring-2 focus:ring-blue-800 h-10 border border-neutral-800 rounded-lg"
               />
@@ -138,14 +145,16 @@ const SignUpTeacherForm = () => {
 
             <button
               type="submit"
-              className=" hover:cursor-pointer mt-1 h-12 w-full bg-slate-100 text-black font-medium rounded-lg hover:bg-slate-200 active:scale-98 transition-all"
+              className="mt-1 h-12 w-full bg-slate-100 text-black font-medium rounded-lg hover:bg-slate-200 hover:cursor-pointer active:scale-98 transition-all"
+
+              onClick={()=>{}}
             >
               Create Account
             </button>
 
             <p className="text-primary mt-1 text-center">
               Already have an account?{" "}
-              <Link href="/sign-in/teacher" className="underline decoration-slate-400 font-semibold">
+              <Link href="/" className="underline decoration-slate-400 font-semibold">
                 Sign In
               </Link>
             </p>
@@ -174,7 +183,7 @@ const SignUpTeacherForm = () => {
               />
             </div>
 
-            {error && <p className="text-red-500">{error}</p>}
+            {error && <p className="text-red-500">Error Occured</p>}
 
             <button
               type="submit"
@@ -189,4 +198,4 @@ const SignUpTeacherForm = () => {
   );
 };
 
-export default SignUpTeacherForm;
+export default SignUpForm;

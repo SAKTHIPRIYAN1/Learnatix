@@ -12,11 +12,14 @@
     "@clerk/clerk-react": "^5.42.1",
     "@clerk/elements": "^0.23.54",
     "@clerk/nextjs": "^6.31.1",
+    "@reduxjs/toolkit": "^2.8.2",
     "@types/axios": "^0.9.36",
     "axios": "^1.11.0",
     "next": "15.4.6",
     "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react-dom": "19.1.0",
+    "react-hot-toast": "^2.6.0",
+    "react-redux": "^9.2.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -24,6 +27,7 @@
     "@types/node": "^20.19.11",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19",
+    "@types/react-redux": "^7.1.34",
     "autoprefixer": "^10.4.21",
     "eslint": "^9",
     "eslint-config-next": "15.4.6",

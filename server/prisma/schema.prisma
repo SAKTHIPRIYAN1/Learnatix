@@ -15,15 +15,57 @@ datasource db {
 }
 
 model Users {
-  clerkId   String   @unique 
+  clerkId   String   @id @unique
   name      String   @db.VarChar(100)
   email     String   @unique
-  role      Role     @default(STUDENT)  // student / teacher
+  role      Role     @default(STUDENT)  // this is a base role
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([clerkId])
+// all classRoom thaat user is participant!!
+  classrooms ClassRoomParticipant[]
+  @@index([clerkId,email])
 }
+
+model ClassRoom {
+  roomId     String @id  @default(uuid())
+  className  String
+  filePath   String?
+  description String
+  
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+// all the pariticipants of that room!!
+  participants ClassRoomParticipant[] 
+//  relation for the invite Token!!
+  inviteToken InviteToken[]
+}
+
+/// Explicit join table for m-n with roles
+model ClassRoomParticipant {
+  id        Int       @id @default(autoincrement())
+  userId    String
+  roomId    String
+  role      Role   
+
+  user      Users     @relation(fields: [userId], references: [clerkId])
+  room      ClassRoom @relation(fields: [roomId], references: [roomId])
+
+  @@unique([userId, roomId]) 
+}
+
+model InviteToken{
+  
+  token String @id
+  classId String
+  createdAt DateTime @default(now())
+  isSharing Boolean  @default(true)
+// relation
+  classRoom ClassRoom @relation(fields: [classId],references: [roomId])
+}
+
+
 
 
 enum Role{
