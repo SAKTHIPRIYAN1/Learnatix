@@ -8,16 +8,19 @@ import axios from "axios";
 import toast from "react-hot-toast";
 
 
-import STUClassRoomCard from "@/_components/(studentComponents)/stu_classroom";
+import ClassRoomCard from "@/_components/(commonComponents)/ClassRoomCard";
 import { ClassRoomResponse } from "@/types/classRoom";
+import { useAppDispatch } from "@/store/hook";
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export default function DashboardClient() {
   const { user, isLoaded } = useUser();
     const router = useRouter();
+    const dispatch=useAppDispatch();
     
   const [enrolledClass,setEnrolledClass]=useState<ClassRoomResponse[]>([]);
+  
   useEffect(() => {
 
     async function getAllClass(){
@@ -64,12 +67,12 @@ export default function DashboardClient() {
   }
 
    return (
-    <div className="overflow-scroll pt-6 flex gap-12">
+    <div className="overflow-y-auto h-full flex gap-12">
 
      {enrolledClass?
         enrolledClass.map((c,idx)=>{
           return(
-            <STUClassRoomCard name={c.name} teachers={c.teachers} description={c.description} pic={c.pic} roomId={c.roomId} students={c.students} key={idx} />
+            <ClassRoomCard basePath="/dashboard/student/classroom" name={c.name} teachers={c.teachers} description={c.description} pic={c.pic} roomId={c.roomId} students={c.students} inviteToken={c.inviteToken} key={idx} />
           )
         }):
         <p>

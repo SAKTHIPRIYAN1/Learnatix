@@ -1,10 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
 import counterReducer from "./slices/counterSlice";
 import userReducer from "./slices/usesrSlice";
+import classRoomReducer from './slices/classRoomSlice';
+
 
 export const store = configureStore({
   reducer: {
     user:userReducer,
+    classroom:classRoomReducer,
   },
 });
 

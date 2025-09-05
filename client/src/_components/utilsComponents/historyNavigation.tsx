@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useEffect } from 'react';
 import RightArrow from '../(Icons)/navRight';
 
 import { usePathname } from 'next/navigation';
@@ -14,6 +14,11 @@ const HistoryNavigation = () => {
 // always the second one is the role!!!
     const role=splittedPath[1];
 
+    // 
+    //  this is the space to change the Class Id map to the actual class in that User Have created
+    //
+
+
     // do the stuff of making breadcrumb items 
     // and also make the link DashBoard -> Teacher Dashboard or Student Dashboard based on the role
 
@@ -22,7 +27,7 @@ const HistoryNavigation = () => {
     }
 
     const customRedirects: Record<string, string> = {
-    dashboard: "/dashboard/" + role
+    dashboard: "/dashboard/" + role +'/classroom'
   };
 
     const skippableNav:string[]=['student','teacher'];
@@ -44,8 +49,8 @@ const HistoryNavigation = () => {
     // Render the breadcrumb navigation
     // For simplicity, we'll just display the current path  as text
   return(
-    <div className='flex font-medium'>
-        <nav className="flex items-center gap-2 text-sm">
+    <div className='flex font-medium pb-6 '>
+        <nav className="flex items-center  gap-2 text-sm">
             {breadcrumbItems.map((nav, idx) => (
                 <span key={idx} className="flex items-center gap-2">
                 <button

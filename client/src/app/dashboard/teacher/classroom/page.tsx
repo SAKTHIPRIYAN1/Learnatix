@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-import ClassRoomCard from "@/_components/(teacherComponents)/ClassRoomCard";
+import ClassRoomCard from "@/_components/(commonComponents)/ClassRoomCard";
 import { ClassRoomResponse } from "@/types/classRoom";
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -61,12 +61,12 @@ export default function DashboardClient() {
   }
 
   return (
-    <div className="overflow-scroll pt-6 flex gap-12">
+    <div className="overflow-scroll  h-full flex gap-12">
 
      {enrolledClass?
         enrolledClass.map((c,idx)=>{
           return(
-            <ClassRoomCard name={c.name} teachers={c.teachers} description={c.description} pic={c.pic} roomId={c.roomId} students={c.students} inviteToken={c.inviteToken} key={idx} />
+            <ClassRoomCard basePath="/dashboard/teacher/classroom" name={c.name} teachers={c.teachers} description={c.description} pic={c.pic} roomId={c.roomId} students={c.students} inviteToken={c.inviteToken} key={idx} />
           )
         }):
         <p>

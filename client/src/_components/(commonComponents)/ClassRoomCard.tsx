@@ -7,23 +7,55 @@ import React, { useState } from "react";
 
 import PeopleIcon from "../(Icons)/peopleIc";
 import TrashIcon from "../(Icons)/trashIc";
-import ChatIcon from "../(Icons)/chatIc";
+import ShareIcon from "../(Icons)/shareIc";
 import toast from "react-hot-toast";
 import { useUser } from "@clerk/clerk-react";
+import ChatIcon from "../(Icons)/chatIc";
 
 import axios from "axios";
+import copyTextToClipboard from '@/utilFunctions/copyToClip';
+import { ClassRoomCardIconDiv } from "./classRoomCardIconDiv";
+import { useRouter} from "next/navigation";
+import Link from "next/link";
 
 // typess..
-import { studentClassRoomResponse } from "@/types/classRoom";
+import { ClassRoomResponse } from "@/types/classRoom";
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-
-
-const STUClassRoomCard = (props:studentClassRoomResponse) => {
+const ClassRoomCard = (props:ClassRoomResponse) => {
   const {isLoaded ,user}=useUser();
+  const router=useRouter();
 
+  const [isSharing,setSharing]=useState<boolean>(props.inviteToken.isSharing);
 
+//  for altering the Sharing Link Acess!!!
+  const handleSharing =async()=>{
+    // if sharing is enabled now only make the magic code copied to the clip board!!!
+    // sending the alteration to the backend!!!
+    try{
+      console.log("clicked Share TOggle!!",isSharing);
+      const res=await axios.patch(API_URL+"/class/updateSharing",{
+        userId:user?.id,
+        roomId:props.roomId,
+        token:props.inviteToken.token,
+        sharing:!isSharing ? true :false
+      });
+      console.log(res);
+      if(!isSharing){
+        copyTextToClipboard(props.inviteToken.token);
+        toast.success("Magic Spell copied !");
+     }
+     else{
+      toast.success("Magic spell is hidden to the Muggles!!!");
+     }
+      setSharing(!isSharing);
+    }
+    catch(err){
+      console.log(err);
+      toast.error("Error in Operation");
+    }
+  }
 
   if(!isLoaded){
     return(
@@ -39,9 +71,14 @@ return (
   <div className="flex overflow-ellipsis w-full gap-3 h-[80%]  justify-between items-center">
     {/* Description */}
     <div className="flex-1 min-w-0">
-      <h2 className="text-lg font-semibold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent">
-        {props.name}
-      </h2>
+      <Link 
+      href={`${props.basePath}/${props.roomId}`} 
+      className="text-lg font-semibold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent 
+                hover:underline hover:decoration-blue-500 hover:underline-offset-4 cursor-pointer transition-all"
+    >
+      {props.name}
+    </Link>
+
       <h3 className="text-sm text-slate-300 mt-1 line-clamp-2">
         {props.teachers[0].user.name}
       </h3>
@@ -62,34 +99,7 @@ return (
   </div>
 
   {/* Icons Section */}
-  <div className="flex justify-between h-[20%] gap-2 mt-4 w-full">
-    
-      <div className=" relative group p-[6px] w-full rounded-lg bg-green-500/10 border border-green-700/40 
-                    flex justify-center cursor-pointer active:scale-95 transition-all 
-                    hover:bg-green-500/20 hover:border-green-500/70">
-      <ChatIcon className="fill-green-400" height={22} width={22} />
-      <span className="absolute bottom-[120%] scale-0 group-hover:scale-100 transition-all bg-slate-500/40  text-gray-50 text-xs rounded-md px-2 py-1 whitespace-nowrap">
-                  Chat 
-        </span>
-    </div>
-   
-    <div className=" relative group p-[6px] w-full rounded-lg bg-blue-500/10 border border-blue-700/40 
-                    flex justify-center cursor-pointer active:scale-95 transition-all 
-                    hover:bg-blue-500/20 hover:border-blue-500/70">
-      <PeopleIcon className="fill-blue-400" height={22} width={22} />
-      <span className="absolute bottom-[120%] scale-0 group-hover:scale-100 transition-all bg-slate-500/40  text-gray-50 text-xs rounded-md px-2 py-1 whitespace-nowrap">
-                  View Participants
-        </span>
-    </div>
-    <div className=" relative group p-[6px] w-full rounded-lg bg-red-500/10 border border-red-700/40 
-                    flex justify-center cursor-pointer active:scale-95 transition-all 
-                    hover:bg-red-500/20 hover:border-red-500/70">
-      <TrashIcon className="fill-red-400" height={22} width={22} />
-      <span className="absolute bottom-[120%] scale-0 group-hover:scale-100 transition-all bg-slate-500/40  text-gray-50 text-xs rounded-md px-2 py-1 whitespace-nowrap">
-                  Delete Class
-        </span>
-    </div>
-  </div>
+  <ClassRoomCardIconDiv baseUrl={props.basePath+'/'+props.roomId } isSharing={isSharing} user={user} handleSharing={handleSharing} />
 </div>
 
   );
@@ -123,4 +133,6 @@ export const CardLoading=()=>{
   )
 }
 
-export default STUClassRoomCard;
+
+
+export default ClassRoomCard;

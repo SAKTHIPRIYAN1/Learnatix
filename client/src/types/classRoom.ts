@@ -3,8 +3,8 @@ interface User {
   name: string;
   email: string;
   role: "TEACHER" | "STUDENT";
-  createdAt: string; // ISO Date string
-  updatedAt: string; // ISO Date string
+  createdAt: string | "Date/Now"; // ISO Date string
+  updatedAt: string | "Date/Now"; // ISO Date string
 }
 
 interface Participant {
@@ -27,16 +27,17 @@ export interface ClassRoomResponse {
   pic: string | null;
   teachers: Participant[];
   students: Participant[];
-  inviteToken:InviteTokens ;
+  inviteToken:InviteTokens | {isSharing:false,token:"nothing Happened"} ;
+  basePath:string;
 }
 
-export interface studentClassRoomResponse{
-  roomId: string;
-  name: string;
-  description: string | null;
-  pic: string | null;
-  teachers: Participant[];
-  students: Participant[];
+
+export  interface ChatMessage{
+  message:string,
+  senderId:string,
+  senderName:string,
+  previousSender?:string;
 }
 
+export type ClassRoomOptions ="chat" | "people" | "works" | "tasks" | "notes";
 

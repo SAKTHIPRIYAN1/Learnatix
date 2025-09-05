@@ -1,6 +1,6 @@
 
-import Sidebar from "@/_components/(commomComponents)/sidebar";
-import Header from "@/_components/(commomComponents)/header";  
+import Sidebar from "@/_components/utilsComponents/sidebar";
+import Header from "@/_components/utilsComponents/header";  
 import { IconGraph,IconBell,IconStudent } from "@/_components/(Icons)/Icons";
 import { IconNotebook } from "@/_components/(Icons)/bookIcon";
 import HistoryNavigation from "@/_components/utilsComponents/historyNavigation";
@@ -20,10 +20,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex h-[100vh] relative justify-center items-center bg-black pb-4 min-w-screen">
+    <div className="flex h-[100vh] relative justify-center items-center bg-[#010108]  overflow-y-auto min-w-screen">
       <Header />
       <Sidebar DashboardLinks={studentDashboardLinks} />
-      <div className="  ml-60  w-full pt-19 relative bg-[#010108] gap-3 flex-row pl-6 h-full ">
+      <div className="  ml-60  w-full pt-19 relative bg-[#010108]  gap-3 flex-row pl-6 h-full ">
         <HistoryNavigation />
         <JoinClassRoomComp />
         {children}

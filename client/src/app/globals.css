@@ -8,7 +8,7 @@
 
 @layer utilities{
   :root{
-    @apply h-[100vh] w-[100vw] bg-[rgb(3,8,22)] 
+    @apply h-[100vh] w-[100vw] bg-black 
   }
   .loader {
     width: 55px;
