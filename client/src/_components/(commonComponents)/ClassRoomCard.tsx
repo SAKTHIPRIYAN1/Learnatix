@@ -72,8 +72,9 @@ return (
     {/* Description */}
     <div className="flex-1 min-w-0">
       <Link 
-      href={`${props.basePath}/${props.roomId}`} 
-      className="text-lg font-semibold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent 
+      href={`${props.basePath}/${props.roomId}`}
+      
+      className="text-lg font-semibold bg-gradient-to-r from-cyan-400 to-blue-600 bg-clip-text text-transparent
                 hover:underline hover:decoration-blue-500 hover:underline-offset-4 cursor-pointer transition-all"
     >
       {props.name}
@@ -99,7 +100,7 @@ return (
   </div>
 
   {/* Icons Section */}
-  <ClassRoomCardIconDiv baseUrl={props.basePath+'/'+props.roomId } isSharing={isSharing} user={user} handleSharing={handleSharing} />
+  <ClassRoomCardIconDiv baseUrl={props.basePath+'/'+props.roomId } isSharing={isSharing} user={user} handleSharing={handleSharing}  />
 </div>
 
   );

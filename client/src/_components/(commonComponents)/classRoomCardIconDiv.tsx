@@ -8,7 +8,7 @@ import ChatIcon from "../(Icons)/chatIc";
 import { useAppDispatch } from "@/store/hook";
 import { setActiveTab } from "@/store/slices/classRoomSlice";
 import { useRouter } from "next/navigation";
-
+import { Participant } from "@/types/classRoom";
 
 export const ClassRoomCardIconDiv=({handleSharing,isSharing,user,baseUrl}:{handleSharing:VoidFunction,isSharing:boolean,user:any,baseUrl:string})=>{
   const dispatch=useAppDispatch();

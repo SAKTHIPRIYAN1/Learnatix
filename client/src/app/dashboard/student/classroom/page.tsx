@@ -72,7 +72,7 @@ export default function DashboardClient() {
      {enrolledClass?
         enrolledClass.map((c,idx)=>{
           return(
-            <ClassRoomCard basePath="/dashboard/student/classroom" name={c.name} teachers={c.teachers} description={c.description} pic={c.pic} roomId={c.roomId} students={c.students} inviteToken={c.inviteToken} key={idx} />
+            <ClassRoomCard basePath="/dashboard/student/classroom" name={c.name} teachers={c.teachers} description={c.description} pic={c.pic} roomId={c.roomId}  inviteToken={c.inviteToken} key={idx} />
           )
         }):
         <p>

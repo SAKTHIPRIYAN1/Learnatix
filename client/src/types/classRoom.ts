@@ -7,7 +7,7 @@ interface User {
   updatedAt: string | "Date/Now"; // ISO Date string
 }
 
-interface Participant {
+export interface Participant {
   id: number;
   userId: string;
   roomId: string;
@@ -26,7 +26,6 @@ export interface ClassRoomResponse {
   description: string | null;
   pic: string | null;
   teachers: Participant[];
-  students: Participant[];
   inviteToken:InviteTokens | {isSharing:false,token:"nothing Happened"} ;
   basePath:string;
 }
@@ -35,8 +34,10 @@ export interface ClassRoomResponse {
 export  interface ChatMessage{
   message:string,
   senderId:string,
-  senderName:string,
+  senderName?:string,
   previousSender?:string;
+  classRoomId:string;
+  sender?:{name:string,role:"STUDENT" | "TEACHER"}
 }
 
 export type ClassRoomOptions ="chat" | "people" | "works" | "tasks" | "notes";

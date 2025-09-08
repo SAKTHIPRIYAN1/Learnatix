@@ -4,12 +4,18 @@ import { useState, useEffect, useRef, ChangeEvent } from "react";
 import MyEmojiPicker from "../utilsComponents/emojiPicker";
 import InpTypeDivChatPage from "../utilsComponents/InpTypeDivChatPage";
 import ClassRoomChatPageComp from "./classRoomChatPageComp";
+import { useSocket } from "@/lib/socket/socketProvider";
+import { useAppDispatch } from "@/store/hook";
+import { addChatMessage } from "@/store/slices/classRoomSlice";
+import { useUser } from "@clerk/clerk-react";
 
-
-
-const ChatPage = () => {
+const ChatPage = ({classRoomId}:{classRoomId:string}) => {
   const mainRef = useRef<HTMLDivElement | null>(null);
   const [scrollToBottom, setScrollToBottom] = useState(false);
+  
+  const {socket} =useSocket();
+  const dispatch=useAppDispatch();
+  const {user} =useUser();
 
   useEffect(() => {
     if (mainRef.current) {
@@ -19,6 +25,27 @@ const ChatPage = () => {
       });
     }
   }, [scrollToBottom]);
+
+  
+  useEffect(() => {
+    if (!socket || !classRoomId) return;
+    console.log("from ChatPage:",classRoomId);
+    socket.emit("joinClass", classRoomId);
+
+    const handleNewMessage = (data: any) => {
+      console.log("New message:", data);
+      console.log(classRoomId,data.classRoomId);
+      if(classRoomId==data.classRoomId && user?.id !=data.senderId){
+        console.log("adding New MEssages");
+        dispatch(addChatMessage(data))
+      }
+    };
+
+    // for handling new Messages in the Group
+    socket.on("newMessage", handleNewMessage);
+
+    
+  }, [socket, classRoomId]);
 
   const Auth = true;
   const isEmpty = false;
@@ -35,8 +62,8 @@ const ChatPage = () => {
   }
 
   return (
-    <div className="flex  right-0 w-full  relative z-10 h-[532px]">
-      <div className="flex flex-col w-full h-full">
+    <div className="flex   w-full  relative z-10 h-[540px]">
+      <div className="flex m-0 p-0 flex-col w-full h-full">
 
         {/* Actual Message contnet*/}
         <ClassRoomChatPageComp reff={mainRef} />

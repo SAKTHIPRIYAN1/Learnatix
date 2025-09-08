@@ -2,16 +2,19 @@
 
 import { useState, useEffect, useRef, ChangeEvent } from "react";
 import MyEmojiPicker from "./emojiPicker";
+import { useParams } from "next/navigation";
 
+import IconSend from "../(Icons)/sendIcon";
+import IconSmile from "../(Icons)/smileIcon";
+import axios from "axios";
+// useSocket!!!
+import { useSocket } from "@/lib/socket/socketProvider";
 
-
-
-const ClipIc = () => <span className="text-slate-400">📎</span>;
-const Similey = () => <span className="text-yellow-400">😊</span>;
-const SendIc = () => <span className="text-blue-400">➡️</span>;
-
-
-
+// storee..
+import { useAppDispatch,useAppSelector } from "@/store/hook";
+import { addChatMessage } from "@/store/slices/classRoomSlice";
+import { useUser } from "@clerk/clerk-react";
+const API_URL=process.env.NEXT_PUBLIC_BACKEND_URL;
 
 type TyperDivProps = {
   scrollfunc: React.Dispatch<React.SetStateAction<boolean>>;
@@ -19,10 +22,20 @@ type TyperDivProps = {
 
 // this is the Type  div for the chat Page!!!!!....
 const InpTypeDivChatPage = ({ scrollfunc }: TyperDivProps) => {
-  const [message, setMessage] = useState("");
-  const [isPickerVisible, setVisible] = useState(false);
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  // const FileRef = useRef<HTMLInputElement | null>(null);
+      const [message, setMessage] = useState("");
+      const [isPickerVisible, setVisible] = useState(false);
+      const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+      // const FileRef = useRef<HTMLInputElement | null>(null);
+      const {user}=useUser();
+      
+      const dispatch=useAppDispatch();
+      const {name} = useAppSelector((store)=>store.user);
+
+      const {socket} = useSocket();
+
+      // for extracting the classRoomId!!!!
+      const params = useParams();
+      const classRoomId = params.classRoomId as string;
 
   const handleInput = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(e.target.value);
@@ -42,10 +55,27 @@ const InpTypeDivChatPage = ({ scrollfunc }: TyperDivProps) => {
   };
 
 
+
+
   // this is the function to actually send the message!!!
-  const handleSend = () => {
-    if (message.trim().length <= 0) return;
-    console.log("Sending:", message);
+  const handleSend = async() => {
+    if (message.trim().length <= 0) {
+      return;
+    }
+
+    try{
+      const res=await axios.post(`${API_URL}/chat/sendMessage`,{
+        message,
+        senderId:user? user.id :"Myid",
+        senderName:name? name :"Unknown",
+        classRoomId
+      });
+
+      console.log("Result of the sending:",res.data);
+    }catch(err){
+      console.log(err);
+    }
+    
     setMessage("");
     scrollfunc((cur) => !cur); // scroll down after sending
   };
@@ -56,7 +86,7 @@ const InpTypeDivChatPage = ({ scrollfunc }: TyperDivProps) => {
   // };
 
   return (
-    <div className="flex px-4 w-full min-h-[50px] bg-slate-900/30 backdrop-blur-lg border-t border-slate-700 items-center">
+    <div className="flex px-4 m-0  w-full min-h-[50px] bg-slate-900/30 backdrop-blur-lg border-t border-slate-700 items-center">
       {/* File Upload */}
       
 
@@ -66,7 +96,7 @@ const InpTypeDivChatPage = ({ scrollfunc }: TyperDivProps) => {
         value={message}
         onChange={handleInput}
         placeholder="Enter your message..."
-        className="resize-none bg-transparent flex-1 outline-none overflow-hidden my-auto text-slate-200"
+        className="resize-none bg-transparent flex-1 outline-none overflow-hidden    my-auto text-slate-200"
         rows={1}
         style={{ maxHeight: "150px" }}
       />
@@ -74,11 +104,11 @@ const InpTypeDivChatPage = ({ scrollfunc }: TyperDivProps) => {
       {/* Action Icons */}
       <div className="flex items-center gap-4 ml-4">
         <div onClick={() => setVisible((v) => !v)}>
-          <Similey />
+          <IconSmile height={22} width={22} className="fill-yellow-500 hover:opacity-95 cursor-pointer active:scale-90 transition-all " />
         </div>
         {isPickerVisible && <MyEmojiPicker func={setMessage} val={message} />}
         <div onClick={handleSend}>
-          <SendIc />
+          <IconSend height={21} width={21} className="fill-blue-500 cursor-pointer active:scale-90 transition-all " />
         </div>
       </div>
     </div>

@@ -122,7 +122,6 @@ export const getAllClassRoom:RequestHandler=async(req:Request<{},{},{
                     name: c.room.className,
                     description: c.room.description,
                     teachers,
-                    students,
                     pic:c.room.filePath,
                     inviteToken:c.room.inviteToken[0]
                 }
@@ -213,7 +212,6 @@ export const joinClassRoom:RequestHandler=async(req:Request<{},{},{
             name: classDetails.className,
             description: classDetails.description,
             teachers,
-            students,
             pic: classDetails.filePath,
             
         };

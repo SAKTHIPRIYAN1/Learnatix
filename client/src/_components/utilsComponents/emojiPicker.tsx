@@ -412,7 +412,7 @@ const MyEmojiPicker=({func,val}:{func:React.Dispatch<React.SetStateAction<string
       
       
     return(
-        <div className=" select-none sm:w-80 overflow-scroll  flex flex-col absolute bottom-[100%] bg-sender h-96  w-[350px] mb-2  right-2 p-3 ">
+        <div className=" bg-slate-950/40 border border-slate-800/60 rounded-md backdrop-blur-md select-none sm:w-80 overflow-scroll  flex flex-col absolute bottom-[100%] bg-sender h-96  w-[350px] mb-2  right-2 p-3 ">
           <div className="pb-2 font-bold text-slate-300 ">
             Pick Your Emotions
           </div>

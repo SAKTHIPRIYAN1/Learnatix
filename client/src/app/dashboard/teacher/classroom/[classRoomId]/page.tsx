@@ -9,6 +9,8 @@ import { useAppDispatch,useAppSelector } from "@/store/hook";
 import { setActiveTab } from "@/store/slices/classRoomSlice";
 import { ClassRoomOptions } from "@/types/classRoom";
 import { label } from "framer-motion/client";
+import ParticipantsPage from "@/_components/(commonComponents)/classRoomParticiapants";
+import NotesPage from "@/_components/(commonComponents)/notesPage";
 
 const IndividualStudentClass = () => {
   const params = useParams();
@@ -59,13 +61,13 @@ const IndividualStudentClass = () => {
   // for to fins it is forwaard or backward!!!!
 
   const getDirection = (from: string, to: string) => {
-    const order = ["chat", "people", "works"];
+    const order = ["chat", "people","notes","works"];
     return order.indexOf(to) - order.indexOf(from);
   };
 
   return (
     <div className="flex items-start justify-center w-full  pb-2  pr-5 h-full">
-       <div className=" h-[600px] overflow-y-auto pb-3 w-full px-4 bg-slate-950/20 flex flex-col border-[1px] rounded-2xl border-slate-600/30">
+       <div className=" h-[600px] overflow-y-auto pb-2 w-full px-4 bg-slate-950/20 flex flex-col border-[1px] rounded-2xl border-slate-600/30">
           {/* Header Tabs */}
           <div className="flex gap-5 border-b border-slate-700/40 z-[10] bg-slate-950/20 backdrop-blur-md">
             {tabs.map((tab) => (
@@ -102,10 +104,10 @@ const IndividualStudentClass = () => {
                 transition={{ duration: 0.35, ease: "easeInOut" }}
                 className="w-full h-auto"
               >
-                {activeTab === "chat" && <ChatPage />}
-                {activeTab === "people" && <ParticipantsPage />}
+                {activeTab === "chat" && <ChatPage classRoomId={classRoomId} />}
+                {activeTab === "people" && <ParticipantsPage classId={classRoomId} />}
                 {activeTab === "works" && <WorksPage />}
-                {activeTab === "notes" && <NotesPage />}
+                {activeTab === "notes" && <NotesPage classId={classRoomId} />}
               </motion.div>
             </AnimatePresence>
           </div>
@@ -117,13 +119,9 @@ const IndividualStudentClass = () => {
 
 
 
-const ParticipantsPage = () => (
-  <div className="p-4 text-slate-300">Participants list goes here...</div>
-);
 
-const NotesPage = () => (
-  <div className="p-4 text-slate-300">Participants list goes here...</div>
-);
+
+
 
 const WorksPage = () => (
   <div className="p-4 text-slate-300">works works go here...</div>

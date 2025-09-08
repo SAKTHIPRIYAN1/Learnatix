@@ -8,8 +8,16 @@ import path from "path";
 
 // impoting the routers...
 import signupRouter from "./router/signupRoute";
-import userRouter from "./router/userRouter";
+import userRouter from "./router/userRoute";
 import classRouter from "./router/classRoute";
+import chatRouter from "./router/chatRouter";
+import participantRouter from "./router/participantRoute";
+import notesRouter from "./router/notesRoute";
+
+
+
+// importing the Socket ..
+import { initSocket } from "./socket";
 
 
 
@@ -33,17 +41,25 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(pathPrinter);
 
+// routers mappings!!!
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 app.use('/signup',signupRouter);
 app.use('/users',userRouter);
 app.use('/class',classRouter);
+app.use('/chat',chatRouter);
+app.use('/participants',participantRouter);
+app.use('/notes',notesRouter);
 
 
 app.get("/",async (req:Request,res:Response)=>{
     res.status(200).send({msg:"Hello from Server"});
 })
 
-// starting the server!!!
-app.listen(5000,()=>{
-    console.log("Server was started.");
-})
+// --- Start HTTP + Socket.IO server ---
+const server = initSocket(app);
+
+const PORT=process.env.PORT || "5000";
+
+server.listen(PORT, () => {
+  console.log(`Server started on http://localhost:${PORT}`);
+});

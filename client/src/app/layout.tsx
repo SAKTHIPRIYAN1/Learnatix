@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Roboto } from "next/font/google";
 import "./globals.css";
-
+import { SocketProvider } from "@/lib/socket/socketProvider";
 
 // clerk provider..
 import {
@@ -47,44 +47,47 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} ${roboto.variable} antialiased`}
       >
+
         <Providers>
-          {children}
-          <Toaster
-              position="bottom-right"
-              toastOptions={{
-                // Default styles for all toasts
-                style: {
-                  background: "rgb(3,8,22)", // slate-800
-                  color: "#f8fafc", // slate-50
-                  borderRadius: "12px",
-                  padding: "10px 10px",
-                  fontSize: "13px",
-                  border: "1px solid #334155", // slate-700
-                },
-
-                // Success-specific
-                success: {
+          <SocketProvider>
+            {children}
+            <Toaster
+                position="bottom-right"
+                toastOptions={{
+                  // Default styles for all toasts
                   style: {
-                    color: "#ecfdf5",
+                    background: "rgb(3,8,22)", // slate-800
+                    color: "#f8fafc", // slate-50
+                    borderRadius: "12px",
+                    padding: "10px 10px",
+                    fontSize: "13px",
+                    border: "1px solid #334155", // slate-700
                   },
-                  iconTheme: {
-                    primary: "#10b981", // emerald
-                    secondary: "#fff",
-                  },
-                },
 
-                // Error-specific
-                error: {
-                  style: {
-                    color: "#fee2e2",
+                  // Success-specific
+                  success: {
+                    style: {
+                      color: "#ecfdf5",
+                    },
+                    iconTheme: {
+                      primary: "#10b981", // emerald
+                      secondary: "#fff",
+                    },
                   },
-                  iconTheme: {
-                    primary: "#ef4444", // red
-                    secondary: "#fff",
+
+                  // Error-specific
+                  error: {
+                    style: {
+                      color: "#fee2e2",
+                    },
+                    iconTheme: {
+                      primary: "#ef4444", // red
+                      secondary: "#fff",
+                    },
                   },
-                },
-              }}
-            />
+                }}
+              />
+          </SocketProvider>
         </Providers>
       </body>
     </html>

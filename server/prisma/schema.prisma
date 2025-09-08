@@ -24,6 +24,12 @@ model Users {
 
 // all classRoom thaat user is participant!!
   classrooms ClassRoomParticipant[]
+
+// all chat the User has..
+  chatMessages Chat[]
+
+// user Notes..
+
   @@index([clerkId,email])
 }
 
@@ -40,6 +46,10 @@ model ClassRoom {
   participants ClassRoomParticipant[] 
 //  relation for the invite Token!!
   inviteToken InviteToken[]
+// relation to the Chat Messages
+  chatMessages Chat[]
+
+  notes Notes[]
 }
 
 /// Explicit join table for m-n with roles
@@ -52,20 +62,46 @@ model ClassRoomParticipant {
   user      Users     @relation(fields: [userId], references: [clerkId])
   room      ClassRoom @relation(fields: [roomId], references: [roomId])
 
-  @@unique([userId, roomId]) 
+  @@unique([userId, roomId])
 }
 
 model InviteToken{
-  
   token String @id
   classId String
   createdAt DateTime @default(now())
   isSharing Boolean  @default(true)
+
 // relation
   classRoom ClassRoom @relation(fields: [classId],references: [roomId])
 }
 
+model Chat{
+  chatId String @id @default(uuid())
+  message String
+  classId String
+  createdAt DateTime @default(now())
+  senderId String
 
+  // relation for the classRoom Model
+  classRoom ClassRoom @relation(fields: [classId],references: [roomId])
+  // relation to  the User Model
+  sender Users @relation(fields: [senderId],references: [clerkId])
+
+  @@index([classId])
+}
+
+
+model Notes {
+  notesId   String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  notesPath String   @unique
+  name String
+  description String
+  classId   String
+  classRoom ClassRoom @relation(fields: [classId], references: [roomId])
+
+  @@index([classId])
+}
 
 
 enum Role{

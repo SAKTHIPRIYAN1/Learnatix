@@ -7,6 +7,9 @@ import ChatPage from "@/_components/(commonComponents)/chatPage";
 import { useAppDispatch,useAppSelector } from "@/store/hook";
 import { setActiveTab } from "@/store/slices/classRoomSlice";
 import { ClassRoomOptions } from "@/types/classRoom";
+import ParticipantsPage from "@/_components/(commonComponents)/classRoomParticiapants";
+import NotesPage from "@/_components/(commonComponents)/notesPage";
+
 
 const IndividualStudentClass = () => {
   const params = useParams();
@@ -62,7 +65,7 @@ const IndividualStudentClass = () => {
 
   return (
     <div className="flex items-start justify-center w-full  pb-2 pr-5 h-full">
-      <div className="h-[600px]  pb-3 w-full px-4 bg-slate-950/20 flex flex-col border-[1px] rounded-2xl border-slate-600/30">
+      <div className="h-[600px]  pb-2 w-full px-4 bg-slate-950/20 flex flex-col border-[1px] rounded-2xl border-slate-600/30">
         {/* Header Tabs */}
         <div className="flex gap-5 border-b border-slate-700/40 z-[10] bg-slate-950/20 backdrop-blur-md">
           {tabs.map((tab) => (
@@ -87,7 +90,7 @@ const IndividualStudentClass = () => {
         </div>
 
         {/* Scrollable Content */}
-        <div className="h-[600px]   overflow-x-hidden relative">
+        <div className="h-[600px] pb-0  overflow-x-hidden relative">
           <AnimatePresence mode="wait" custom={getDirection(prevTab, activeTab)}>
             <motion.div
               key={activeTab}
@@ -97,12 +100,12 @@ const IndividualStudentClass = () => {
               animate="center"
               exit="exit"
               transition={{ duration: 0.35, ease: "easeInOut" }}
-              className="w-full h-auto"
+              className="w-full h-auto pb-0"
             >
-              {activeTab === "chat" && <ChatPage />}
-              {activeTab === "people" && <ParticipantsPage />}
+              {activeTab === "chat" && <ChatPage classRoomId={classRoomId} />}
+              {activeTab === "people" && <ParticipantsPage classId={classRoomId} />}
               {activeTab === "tasks" && <TasksPage />}
-              {activeTab === "notes" && <NotesPage />}
+              {activeTab === "notes" && <NotesPage classId={classRoomId}/>}
             </motion.div>
           </AnimatePresence>
         </div>
@@ -112,18 +115,9 @@ const IndividualStudentClass = () => {
   );
 };
 
-
-
-
-const ParticipantsPage = () => (
-  <div className="p-4 text-slate-300">Participants list goes here...</div>
-);
-
 const TasksPage = () => (
   <div className="p-4 text-slate-300">tasks works go here...</div>
 );
-const NotesPage = () => (
-  <div className="p-4 text-slate-300">tasks works go here...</div>
-);
+
 
 export default IndividualStudentClass;
