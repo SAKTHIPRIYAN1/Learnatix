@@ -9,7 +9,7 @@ import { setActiveTab } from "@/store/slices/classRoomSlice";
 import { ClassRoomOptions } from "@/types/classRoom";
 import ParticipantsPage from "@/_components/(commonComponents)/classRoomParticiapants";
 import NotesPage from "@/_components/(commonComponents)/notesPage";
-
+import TaskComponent from "@/_components/(commonComponents)/taskComponent";
 
 const IndividualStudentClass = () => {
   const params = useParams();
@@ -104,7 +104,7 @@ const IndividualStudentClass = () => {
             >
               {activeTab === "chat" && <ChatPage classRoomId={classRoomId} />}
               {activeTab === "people" && <ParticipantsPage classId={classRoomId} />}
-              {activeTab === "tasks" && <TasksPage />}
+              {activeTab === "tasks" && <TaskComponent classId={classRoomId} />}
               {activeTab === "notes" && <NotesPage classId={classRoomId}/>}
             </motion.div>
           </AnimatePresence>

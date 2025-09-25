@@ -176,7 +176,7 @@ const NotesPage = ({ classId }: { classId: string }) => {
           notes.map((note,idx) => (
             <div
               key={idx}
-              className="relative flex items-center gap-4 bg-gradient-to-r from-slate-800/40 to-slate-900/20 border border-slate-700/40 backdrop-blur-md rounded-xl px-4 py-3 hover:border-cyan-500/30 transition group"
+              className="relative flex items-center gap-4 bg-gradient-to-r from-sky-800/20 to-blue-800/20 border border-slate-700/40 backdrop-blur-md rounded-xl px-4 py-3 hover:border-cyan-500/30 transition group"
             >
               {/* File icon */}
               <div className="w-12 h-12 rounded-lg bg-slate-700/50 flex items-center justify-center">

@@ -28,7 +28,12 @@ model Users {
 // all chat the User has..
   chatMessages Chat[]
 
-// user Notes..
+// all the task created by the user!!!
+  tasks Task[]
+
+// all the Submission of the User!!
+  submissions TaskSubmission[]
+
 
   @@index([clerkId,email])
 }
@@ -50,6 +55,9 @@ model ClassRoom {
   chatMessages Chat[]
 
   notes Notes[]
+
+  tasks Task[]
+
 }
 
 /// Explicit join table for m-n with roles
@@ -59,8 +67,8 @@ model ClassRoomParticipant {
   roomId    String
   role      Role   
 
-  user      Users     @relation(fields: [userId], references: [clerkId])
-  room      ClassRoom @relation(fields: [roomId], references: [roomId])
+  user      Users     @relation(fields: [userId], references: [clerkId],onDelete: Cascade)
+  room      ClassRoom @relation(fields: [roomId], references: [roomId],onDelete: Cascade)
 
   @@unique([userId, roomId])
 }
@@ -72,7 +80,7 @@ model InviteToken{
   isSharing Boolean  @default(true)
 
 // relation
-  classRoom ClassRoom @relation(fields: [classId],references: [roomId])
+  classRoom ClassRoom @relation(fields: [classId],references: [roomId],onDelete: Cascade)
 }
 
 model Chat{
@@ -83,9 +91,9 @@ model Chat{
   senderId String
 
   // relation for the classRoom Model
-  classRoom ClassRoom @relation(fields: [classId],references: [roomId])
+  classRoom ClassRoom @relation(fields: [classId],references: [roomId],onDelete: Cascade)
   // relation to  the User Model
-  sender Users @relation(fields: [senderId],references: [clerkId])
+  sender Users @relation(fields: [senderId],references: [clerkId],onDelete: Cascade)
 
   @@index([classId])
 }
@@ -98,15 +106,64 @@ model Notes {
   name String
   description String
   classId   String
-  classRoom ClassRoom @relation(fields: [classId], references: [roomId])
+  classRoom ClassRoom @relation(fields: [classId], references: [roomId],onDelete: Cascade)
 
   @@index([classId])
 }
 
 
+model Task {
+  taskId String @id @default(uuid())
+  name String
+  description String
+  dueDate DateTime
+  filePath String
+  
+  createdAt DateTime @default(now())
+  
+  // teacher task relation using user
+  teacherId String
+  Teacher Users @relation(fields: [teacherId],references: [clerkId],onDelete: Cascade)
+
+// class Task Relation
+  classId   String
+  classRoom ClassRoom @relation(fields: [classId], references: [roomId],onDelete: Cascade)
+
+// submission task Relation
+  submission TaskSubmission[]
+  @@index([taskId])
+}
+
+
+model TaskSubmission{
+  submissionId String @id @default(uuid())
+  createdAt DateTime @default(now())
+  remark String @default("")
+  review String @default("")
+  score Int?  // score can be null if not reviewed yet
+  filePath String
+
+// task Relation with the submission!!!
+  taskId String
+  task Task @relation(fields: [taskId],references: [taskId],onDelete: Cascade)
+
+  studentId String
+  student Users @relation(fields: [studentId],references: [clerkId],onDelete: Cascade)
+  @@index([taskId])
+  @@index([studentId])
+}
+
+
+
+
 enum Role{
   TEACHER
   STUDENT
+}
+
+enum TaskType{
+  QUIZ
+  ASSIGNMENT
 }
 
 

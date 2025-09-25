@@ -40,5 +40,17 @@ export  interface ChatMessage{
   sender?:{name:string,role:"STUDENT" | "TEACHER"}
 }
 
+
+export interface TaskType{
+  type:"ASSIGNMENT" | "QUIZZ",
+  taskId:string,
+  instructions:string,
+  dueDate:Date,
+  submitDate?:Date,
+  review?:string,
+  score?:string,
+  totalScore?:string
+}
+
 export type ClassRoomOptions ="chat" | "people" | "works" | "tasks" | "notes";
 

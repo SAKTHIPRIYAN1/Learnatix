@@ -41,7 +41,7 @@ const SideBarFooter = () => {
         name: userName,
         email: user.emailAddresses[0]?.emailAddress || "",
         imageUrl: user.imageUrl || "",
-        role: "STUDENT",
+        role: (user.unsafeMetadata.role as "STUDENT" || "TEACHER") || "STUDENT",
       });
     };
 

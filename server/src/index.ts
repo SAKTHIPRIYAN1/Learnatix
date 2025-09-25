@@ -10,10 +10,10 @@ import path from "path";
 import signupRouter from "./router/signupRoute";
 import userRouter from "./router/userRoute";
 import classRouter from "./router/classRoute";
-import chatRouter from "./router/chatRouter";
+import chatRouter from "./router/chatRoute";
 import participantRouter from "./router/participantRoute";
 import notesRouter from "./router/notesRoute";
-
+import taskRouter from "./router/taskRoute";
 
 
 // importing the Socket ..
@@ -49,6 +49,9 @@ app.use('/class',classRouter);
 app.use('/chat',chatRouter);
 app.use('/participants',participantRouter);
 app.use('/notes',notesRouter);
+app.use('/task',taskRouter);
+
+
 
 
 app.get("/",async (req:Request,res:Response)=>{

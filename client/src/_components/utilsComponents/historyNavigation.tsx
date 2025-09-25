@@ -44,8 +44,6 @@ const HistoryNavigation = () => {
         }, [] as { name: string; href: string }[]);
 
 
-    console.log("Breadcrumb Items:", breadcrumbItems);
-
     // Render the breadcrumb navigation
     // For simplicity, we'll just display the current path  as text
   return(
