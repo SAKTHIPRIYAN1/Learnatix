@@ -16,7 +16,7 @@ const MessageContainer = ({ sender, message, senderId, senderName,previousSender
       {user.id === senderId ? (
         <YourMessContainer Mess={message} Name={"You"} showName={showName} />
       ) : (
-        <TheirMessContainer Mess={message} Name={sender?.name ?? "Unknown"} showName={showName} isTeacher={sender?.role ==="TEACHER"} />
+        <TheirMessContainer Mess={message} Name={senderName ?? "Unkown"} showName={showName} isTeacher={sender?.role ==="TEACHER"} />
       )}
     </div>
   );

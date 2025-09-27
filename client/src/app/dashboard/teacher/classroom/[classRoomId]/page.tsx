@@ -12,6 +12,9 @@ import { label } from "framer-motion/client";
 import ParticipantsPage from "@/_components/(commonComponents)/classRoomParticiapants";
 import NotesPage from "@/_components/(commonComponents)/notesPage";
 import TaskComponent from "@/_components/(commonComponents)/taskComponent";
+import { useEffect } from "react";
+
+import {useSocket} from '@/lib/socket/socketProvider';
 
 const IndividualStudentClass = () => {
   const params = useParams();
@@ -19,6 +22,18 @@ const IndividualStudentClass = () => {
 
   const dispatch=useAppDispatch();
   const {activeTab} =useAppSelector((store)=>store.classroom);
+
+  const socket=useSocket().socket;
+  useEffect(()=>{
+      if(!socket || !classRoomId)
+        return;
+      socket.emit("joinClass",classRoomId);
+  
+      // cleanup function
+      return ()=>{
+        socket.emit("leaveClass",classRoomId);
+      }
+    },[socket,classRoomId]);
   
 
   const tabs = [

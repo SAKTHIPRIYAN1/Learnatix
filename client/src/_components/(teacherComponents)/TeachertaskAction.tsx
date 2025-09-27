@@ -5,6 +5,7 @@ import {  Download } from "lucide-react";
 import toast from "react-hot-toast";
 import {Task } from "@/types/taskRelatedTypes";
 import axios from "axios";
+import { form } from "framer-motion/client";
 
 const API_URL=process.env.NEXT_PUBLIC_BACKEND_URL;
 /* ---------------------- Helpers ------------------------ */
@@ -18,33 +19,64 @@ const formatDate = (iso?: string | null) => {
 /* ---------------- Teacher Review Subcomponent ---------------- */
 const TeacherReviewSection = ({ task,userId }: { task: Task,userId:string }) => {
   const [expanded, setExpanded] = useState(false);
+  const [score,setScore]=useState<number>(0);
+  const [review,setReview]=useState<string>("");
+  const [isReviwed,setIsReviwed]=useState<boolean>(false);
+
   console.log(task);
 
-  const handleReviewSubmit = (submissionId: string, score: number, review: string,studentId:string) => {
+  const handleReviewSubmit = async (submissionId:string) => {
     console.log("Teacher Reviewed!!!");
-    toast.success(`Reviewed : ${score} pts - "${review}"`);
-  };
 
-  useEffect( ()=>{
-    // get all Submissions for the task..
-    async function fetchSubmissions(){
-      if(!task || !task.taskId)
-        return;
-      try{
-          const res=await axios.get(`${API_URL}/task/submissions/${task.taskId}/${userId}`);
-
-          console.log("Submission fetched:",res.data);
-          const data=res.data as {msg:string,submissions:Task["submission"]};
-        }
-        catch(err){
-          console.log(err);
-          toast.error("Error fetching submissions");
-        }
+    if (!task || !score || !review || !userId) {
+      toast.error("Fill all the fields!");
+      return;
     }
 
-    fetchSubmissions();
+    if(score<0 || score>100){
+      toast.error("Enter Valid Score");
+      return;
+    }
 
-  }, [task])
+    try{
+      const formData= new FormData();
+      formData.append("submissionId",submissionId);
+      formData.append("score",score.toString());
+      formData.append("review",review);
+      formData.append("userId",userId);
+      const res = await axios.post(`${API_URL}/task/submission/review`, {
+            submissionId,
+            score,
+            review,
+            userId
+          });
+
+      console.log("Review Response:",res.data);
+      toast.success("Review submitted successfully");
+      setIsReviwed(true);
+
+      
+      // Optionally, you can clear the form or give feedback to the teacher
+      // Clear form and close the review section
+      // make the form Disappear and show the updated review
+      setScore(score);
+      setReview("");
+      setExpanded(false); 
+
+      // Make the socket Connection and update Value here ...
+
+      // Optionally, you can also refresh the submissions list here to show the updated review
+      setExpanded(true);
+
+      
+    }catch(err){
+      console.log(err);
+      toast.error("Error in Reviewing Submission");
+    }
+
+  };
+
+
   return (
     <div className="mt-4">
       <button
@@ -58,10 +90,10 @@ const TeacherReviewSection = ({ task,userId }: { task: Task,userId:string }) => 
       {expanded && (
         <div className="mt-3 space-y-3">
           {task.submission && task.submission.length > 0 ? (
-            task.submission.map((s) => (
+            task.submission.map((s,idx) => (
               // actual task of the sudent!!!
               <div
-                key={s.id}
+                key={idx}
                 className="bg-slate-800/30 p-3 rounded-lg border border-slate-700/30"
               >
                 {/* the students task and content */}
@@ -70,7 +102,7 @@ const TeacherReviewSection = ({ task,userId }: { task: Task,userId:string }) => 
                     <div className="text-sm font-medium text-slate-300">
                       {s.student?.name ?? s.studentId}
                     </div>
-                    <div className="text-xs text-slate-400">{s.text}</div>
+                    <div className="text-xs text-slate-400 mt-1">{s.remark}</div>
                     {s.filePath && (
                       <a
                         href={s.filePath}
@@ -86,20 +118,15 @@ const TeacherReviewSection = ({ task,userId }: { task: Task,userId:string }) => 
                 </div>
                 {/* Review Component!! */}
                 <div className="mt-2">
-                  {s.score != null ? (
+                  {(s.score != null) || isReviwed ? (
                     <div className="text-sm text-emerald-400">
-                      Reviewed: {s.score} pts — {s.review}
+                      Reviewed: {s.score || score} pts — {s.review || review}
                     </div>
                   ) : (
                     <form
                       onSubmit={(e) => {
                         e.preventDefault();
-
-                        // Preprocessing the text in the form!!!
-                        const form = e.currentTarget;
-                        const score = Number((form.elements.namedItem("score") as HTMLInputElement).value);
-                        const review = (form.elements.namedItem("review") as HTMLInputElement).value;
-                        handleReviewSubmit(s.id, score, review,s.studentId);
+                        handleReviewSubmit(s.submissionId);
                       }}
                       className="flex gap-2 mt-1"
                     >
@@ -107,6 +134,8 @@ const TeacherReviewSection = ({ task,userId }: { task: Task,userId:string }) => 
                         type="text"
                         name="score"
                         placeholder="Score"
+                        value={score}
+                        onChange={(e)=>setScore(Number(e.target.value))}
                         required
                         className="w-20 bg-slate-900/30 border border-slate-700/30 outline-none focus:border-cyan-500/40 rounded px-2 text-sm text-slate-200"
                       />
@@ -114,6 +143,8 @@ const TeacherReviewSection = ({ task,userId }: { task: Task,userId:string }) => 
                         type="text"
                         name="review"
                         placeholder="Feedback"
+                        value={review}
+                        onChange={(e)=>setReview(e.target.value)}
                         required
                         className="flex-1 bg-slate-900/30 border border-slate-700/30 outline-none focus:border-cyan-500/40rounded px-2 text-sm text-slate-200"
                       />

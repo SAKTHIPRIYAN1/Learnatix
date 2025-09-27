@@ -16,6 +16,6 @@ taskRouter.delete("/delete/:taskId/:userId/:classId",DeleteTaskController);
 
 // for task Submission By students routes
 taskRouter.post("/submit",upload.single("file"),SubmitTaskController);
-taskRouter.put("/submissions/review",ReviewSubmissionController);
+taskRouter.post("/submission/review",ReviewSubmissionController);
 taskRouter.get("/submissions/:taskId/:userId",GetSubmissionsByTaskController);
 export default taskRouter;

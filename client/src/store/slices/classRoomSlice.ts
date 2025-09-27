@@ -1,22 +1,22 @@
 
 import { createSlice,PayloadAction } from "@reduxjs/toolkit";
-import { ChatMessage } from "@/types/classRoom";
-import { ClassRoomOptions } from "@/types/classRoom";
+import {ClassRoomOptions, ChatMessage,Note} from "@/types/classRoom";
+import { Task } from "@/types/taskRelatedTypes";
+import { act } from "react";
+
+
 interface initialStateTyp{
     activeTab:ClassRoomOptions;
-    chatMessages:ChatMessage[]
+    chatMessages:ChatMessage[];
+    notes:Note[];
+    tasks:Task[];
 }
 
 const initialState: initialStateTyp = {
   activeTab: "chat",
-  chatMessages: [
-    { senderName:"sakthi", classRoomId:"df79f360-70e8-403e-9177-890c1031b549", message: "Hey, how are you doing?", senderId: "user_31myhYnbFuTvBaa7P0aY7DAXXtc" },
-    { senderName:"sakthi", classRoomId:"df79f360-70e8-403e-9177-890c1031b549", message: "I’m good, thanks! What about you?", senderId: "user2" },
-    { senderName:"sakthi", classRoomId:"df79f360-70e8-403e-9177-890c1031b549", message: "Pretty busy with the project, but it’s going well.", senderId: "user_31myhYnbFuTvBaa7P0aY7DAXXtc" },
-    { senderName:"sakthi", classRoomId:"df79f360-70e8-403e-9177-890c1031b549", message: "That’s nice bjkbdkfbgkdbgbbdjkbgjksdbgjkbdkgbbdjbjkdbgjkdbfkgsdbjjsdkgdjksggjkdfjkbdbjk djkgfjsdk gsd fgh kghfdhjkh  hfdh i want to acheive the nav system (in side page.tsx at top) like drive and windows file system eg: parfolder->subFolder->curFolder when i click it it must navigate to that route , how can i acheive like production ready app use generall route in redux centerailized state or for each pages.tsx maunually set that in next js app routeri want to acheive the nav system (in side page.tsx at top) like drive and windows file system eg: parfolder->subFolder->curFolder when i click it it must navigate to that route , how can i acheive like production ready app use generall route in redux centerailized state or for each pages.tsx maunually set that in next js app routeri want to acheive the nav system (in side page.tsx at top) like drive and windows file system eg: parfolder->subFolder->curFolder when i click it it must navigate to that route , how can i acheive like production ready app use generall route in redux centerailized state or for each pages.tsx maunually set that in next js app router to hear. Need any help?", senderId: "user2" },
-    { senderName:"sakthi", classRoomId:"df79f360-70e8-403e-9177-890c1031b549", message: "Maybe later. For now, I’m testing the chat UI.", senderId: "user2" },
-    { senderName:"sakthi", classRoomId:"df79f360-70e8-403e-9177-890c1031b549", message: "Alright, ping me if anything comes up.", senderId: "user_31myhYnbFuTvBaa7P0aY7DAXXtc" },
-  ],
+  chatMessages: [],
+  notes:[],
+  tasks:[]
 };
 
 const ClassRoomSlice = createSlice(
@@ -34,11 +34,39 @@ const ClassRoomSlice = createSlice(
             },
             addChatMessage:(state,action:PayloadAction<ChatMessage>)=>{
                 state.chatMessages.push(action.payload);
-            }
+            },
+
+            // notes reducer functionssss!!!!
+            setNotes:(state,action:PayloadAction<Note[]>)=>{
+                console.log("Notes at the store",action.payload);
+                state.notes=action.payload.reverse();
+            },
+            addNote:(state,action:PayloadAction<Note>)=>{
+                state.notes.unshift(action.payload);
+            },
+            deleteNote:(state,action:PayloadAction<Note>)=>{
+                state.notes=state.notes.filter((n)=>n.notesId!==action.payload.notesId);
+            },
+            
+            // task reducer for task related functions and the operations...
+            setTasks:(state,action:PayloadAction<Task[]>)=>{
+                console.log("Task at the store",action.payload);
+                state.tasks=action.payload.reverse();
+            },
+            addTask:(state,action:PayloadAction<Task>)=>{
+                state.tasks.unshift(action.payload);
+
+            },
+            deleteTask:(state,action:PayloadAction<Task>)=>{
+                state.tasks=state.tasks.filter((t)=>t.taskId!==action.payload.taskId);
+            },
+
         }
     }
 );
 
 
-export const {setActiveTab,addChatMessage,setClassChats} =ClassRoomSlice.actions;
+export const {setActiveTab,addChatMessage,setClassChats,setNotes,addNote,deleteNote
+    ,addTask,deleteTask,setTasks
+} =ClassRoomSlice.actions;
 export default ClassRoomSlice.reducer;

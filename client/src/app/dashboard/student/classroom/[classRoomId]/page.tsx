@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useParams } from "next/navigation";
 import ChatPage from "@/_components/(commonComponents)/chatPage";
@@ -11,9 +11,29 @@ import ParticipantsPage from "@/_components/(commonComponents)/classRoomParticia
 import NotesPage from "@/_components/(commonComponents)/notesPage";
 import TaskComponent from "@/_components/(commonComponents)/taskComponent";
 
+import { useSocket } from "@/lib/socket/socketProvider";
 const IndividualStudentClass = () => {
-  const params = useParams();
+
+
+  // join the userSocket to the respected Room!!
+  const {socket}=useSocket();
+    const params = useParams();
   const classRoomId = params.classRoomId as string;
+
+  useEffect(()=>{
+    if(!socket || !classRoomId)
+      return;
+    socket.emit("joinClass",classRoomId);
+
+    // cleanup function
+    return ()=>{
+      socket.emit("leaveClass",classRoomId);
+    }
+  },[socket,classRoomId]);
+ 
+
+
+
   
   const dispatch=useAppDispatch();
   const {activeTab} =useAppSelector((store)=>store.classroom);

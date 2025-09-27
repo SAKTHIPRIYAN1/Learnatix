@@ -1,7 +1,7 @@
 "use client";
 
 
-import {Task } from "@/types/taskRelatedTypes";
+import {Submission, Task } from "@/types/taskRelatedTypes";
 
 import React, {useState } from "react";
 import {Download } from "lucide-react";
@@ -32,8 +32,10 @@ const StudentTaskActions = ({
   const [file, setFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const mySubmission =
-    task.submission?.find((s) => s.studentId === currentUserId) ?? null;
+  const [mySubmission, setMySubmission] = useState<Submission | null>(
+    task.submission?.find((s) => s.studentId === currentUserId) ?? null
+  );
+
   const duePassed = isPastDue(task.dueDate);
 
   const handleSubmit = async (e: React.FormEvent,taskId:string) => {
@@ -59,13 +61,19 @@ const StudentTaskActions = ({
       const submissionData=new FormData();
       submissionData.append("taskId",taskId);
       submissionData.append("studentId",currentUserId);
-      submissionData.append("review",text);
+      submissionData.append("remark",text);
       if(file)
         submissionData.append("file",file);
       const res =await axios.post(`${API_UPL}/task/submit`,submissionData);
       console.log("Submission response:", res.data);
+      
       toast.success("Task Submitted Successfully!");
       setSubmitting(false);
+      // Update mySubmission state to reflect the new submission
+      const data = res.data as {msg:string,submission:Submission};
+      setMySubmission(data.submission);
+
+      // Clear form
       setText("");
       setFile(null);
       return;
@@ -87,7 +95,7 @@ const StudentTaskActions = ({
                 Your submission
               </div>
               <div className="text-xs text-slate-400">
-                {mySubmission.text ?? "No text"}
+                {mySubmission.review ?? "No text"}
               </div>
               {mySubmission.filePath && (
                 <a

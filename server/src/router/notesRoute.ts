@@ -8,5 +8,5 @@ const notesRouter=Router();
 
 notesRouter.post('/',getAllNotes);
 notesRouter.post('/addNotes',upload.single("file"),addNotes);
-notesRouter.delete('/:notesId',deleteNotes);
+notesRouter.delete('/:notesId/:classId/:userId',deleteNotes);
 export default notesRouter;

@@ -5,20 +5,22 @@ import axios from "axios";
 import { useUser } from "@clerk/clerk-react";
 import toast from "react-hot-toast";
 import { Plus, FileIcon, Trash2 } from "lucide-react";
+import { Note } from "@/types/classRoom";
 
-interface Note {
-  notesId: string;
-  name:string;
-  description: string;
-  notesPath: string;
-  sender:string
-}
+// store content
+import { useAppDispatch,useAppSelector } from "@/store/hook";
+import { setNotes,addNote,deleteNote } from "@/store/slices/classRoomSlice";
+
+import { useSocket } from "@/lib/socket/socketProvider";
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const NotesPage = ({ classId }: { classId: string }) => {
+  const dispatch=useAppDispatch();
+  const notes=useAppSelector((store)=>store.classroom.notes);
+
+
   const { user } = useUser();
-  const [notes, setNotes] = useState<Note[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
 
@@ -26,6 +28,44 @@ const NotesPage = ({ classId }: { classId: string }) => {
   const [topic, setTopic] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const [fileName, setFileName] = useState<string | null>(null);
+
+  const {socket}=useSocket();
+
+
+  // useEffect for NotesPage Socket operation for realtime Update in the notes Page!!!
+  useEffect(()=>{
+    if(!socket || !classId)
+      return;
+
+    // for  realtime notes addition !!
+    const handleAddNote=(data:{classId:string,senderId:string,note:Note})=>{
+
+      console.log("Deleteing NOte");
+      if(classId!=data.classId || data.senderId==user?.id)
+        return;
+      console.log("New Note from Socket:",data);
+      dispatch(addNote(data.note));
+    };
+
+
+    const handleDeleteNote=(data:{classId:string,senderId:string,noteId:string})=>{
+      if(classId!=data.classId || data.senderId==user?.id)
+        return;
+      console.log("Note Deleted from Socket:",data);
+      dispatch(deleteNote({notesId:data.noteId} as Note));
+    }
+
+    
+    socket.on("addNote",handleAddNote);
+    socket.on("deleteNote",handleDeleteNote);
+
+    // cleanup function for these socket!!!!
+    return () => {
+      socket.off("addNote", handleAddNote);
+      socket.off("deleteNote", handleDeleteNote);
+    };
+
+  },[socket,classId])
 
   const fetchNotes = async () => {
     try {
@@ -35,9 +75,10 @@ const NotesPage = ({ classId }: { classId: string }) => {
         classId,
         userId: user.id,
       });
-      console.log(res.data);
+      // console.log(res.data);
       const data = res.data as { msg: string; notes: Note[] };
-      setNotes(data.notes || []);
+      dispatch(setNotes(data.notes|| []));
+
     } catch (err) {
       console.error(err);
       toast.error("Error fetching notes");
@@ -67,15 +108,19 @@ const NotesPage = ({ classId }: { classId: string }) => {
       formData.append("file", file);
       formData.append("name",fileName?fileName:"File");
 
-      await axios.post(`${API_URL}/notes/addNotes`, formData, {
+      const res=await axios.post(`${API_URL}/notes/addNotes`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+      console.log("Note uploaded:", res.data);
+      const data=res.data as {msg:string,note:Note};
 
       toast.success("Note added!");
       setTopic("");
       setFile(null);
       setShowForm(false);
-      fetchNotes();
+      setFileName(null);
+      dispatch(addNote(data.note));
+
     } catch (err) {
       console.error(err);
       toast.error("Failed to upload note");
@@ -85,10 +130,9 @@ const NotesPage = ({ classId }: { classId: string }) => {
   const handleDelete = async (noteId: string) => {
     try {
       console.log("Notes Deleted!!!");
-    const res=await axios.delete(API_URL+'/notes/'+noteId);
-
+      const res=await axios.delete(API_URL+'/notes/'+noteId+'/'+classId+'/'+user?.id);
+      dispatch(deleteNote({notesId:noteId} as Note));
       toast.success("Note deleted!");
-      setNotes((prev) => prev.filter((n) => n.notesId !== noteId));
     } catch (err) {
       console.error(err);
       toast.error("Error deleting note");

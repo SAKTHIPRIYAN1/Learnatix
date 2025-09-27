@@ -1,5 +1,6 @@
 import prisma from "../prisma";
 import { Request,Response } from "express";
+import { getIO } from "../socket";
 
 interface getNotesParams{
     classId:string
@@ -85,7 +86,11 @@ export const addNotes =async(req:Request<{},{},notes>,res:Response)=>{
             }
         });
 
-        res.status(201).json({msg:"Notes Created!",row:insertedRow});
+        // send Socket Updates!!!
+        const io=getIO();
+        io.to(classId).emit("addNote",{ note:insertedRow,classId,senderId:userId });
+
+        res.status(201).json({msg:"Notes Created!",note:insertedRow});
     }
     catch(err){
          console.log(err);
@@ -94,22 +99,44 @@ export const addNotes =async(req:Request<{},{},notes>,res:Response)=>{
 }
 
 
-export const deleteNotes=async(req:Request<{notesId:string}>,res:Response)=>{
+export const deleteNotes=async(req:Request<{notesId:string,classId:string,userId:string}>,res:Response)=>{
     try{
-        const {notesId}=req.params;
-        if(!notesId){
+        const {notesId,classId,userId}=req.params;
+        if(!notesId || !classId || !userId){
             res.status(500).json({msg:"No NotesId Given"});
             return;
         }
 
+        // check if the user is actually the teacher of that class!!
+        const userPart=await prisma.classRoomParticipant.findFirst({
+            where:{
+                roomId:classId,
+                userId,
+                role:"TEACHER"
+            }
+        });
+
+        if(!userPart){
+            res.status(401).json({msg:"Heyy Potter, Not Authorized!!"})
+            return;
+        }
+
+        // delete the notes from the database
         const deletedNotes=await prisma.notes.delete({
             where:{
-                notesId
+                notesId,
             }
         });
 
         console.log(deletedNotes);
 
+        const io=getIO();
+        io.to(classId).emit("deleteNote", { 
+        noteId: deletedNotes.notesId, 
+        classId, 
+        senderId: userId 
+        });
+ 
         res.status(200).json({msg:"Notes Deleted"});
     }catch(err){
         console.log(err);

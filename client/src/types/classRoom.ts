@@ -41,15 +41,12 @@ export  interface ChatMessage{
 }
 
 
-export interface TaskType{
-  type:"ASSIGNMENT" | "QUIZZ",
-  taskId:string,
-  instructions:string,
-  dueDate:Date,
-  submitDate?:Date,
-  review?:string,
-  score?:string,
-  totalScore?:string
+export interface Note {
+  notesId: string;
+  name:string;
+  description: string;
+  notesPath: string;
+  sender:string
 }
 
 export type ClassRoomOptions ="chat" | "people" | "works" | "tasks" | "notes";

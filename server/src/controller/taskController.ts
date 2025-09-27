@@ -3,29 +3,7 @@ import { Request,Response,RequestHandler } from "express";
 
 import prisma from "../prisma";
 
-
-// model Task {
-//   taskId String @id @default(uuid())
-//   name String
-//   description String
-//   dueDate DateTime
-//   filePath String
-  
-//   createdAt DateTime @default(now())
-  
-//   // teacher task relation using user
-//   teacherId String
-//   Teacher Users @relation(fields: [teacherId],references: [clerkId])
-
-// // class Task Relation
-//   classId   String
-//   classRoom ClassRoom @relation(fields: [classId], references: [roomId])
-
-// // submission task Relation
-//   submission TaskSubmission[]
-//   @@index([taskId])
-// }
-
+import {getIO} from "../socket";
 
 
 type Task={
@@ -65,6 +43,10 @@ export const AddTaskController:RequestHandler = async (req:Request<{},{},Task>,r
                 classId
             }
         });
+
+        // sending through the Socket!!!
+        const io=getIO();
+        io.to(classId).emit("addTask",{ task:newTask,classId,senderId:teacherId });
 
         res.status(201).json({msg:"Task added successfully",task:newTask});
         return;
@@ -139,6 +121,9 @@ export const DeleteTaskController = async (req:Request<{taskId:string,userId:str
             where:{taskId}
         });
 
+        // sending through the Socket!!!
+        const io=getIO();
+        io.to(classId).emit("deleteTask",{ taskId,classId,senderId:userId });
         res.status(200).json({msg:"Task deleted successfully"});
         return;
     } catch (error) {

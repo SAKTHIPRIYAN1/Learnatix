@@ -2,11 +2,10 @@
 export type Role = "TEACHER" | "STUDENT" | string;
 
 export type Submission = {
-  id: string;
+  submissionId: string;
   studentId: string;
   studentName?: string;
   student?:{name:string};
-  text?: string;
   filePath: string;
   createdAt: string;
   score?: number | null;

@@ -10,7 +10,12 @@ import StudentTaskActions from "../(studentComponents)/taskAction";
 import TeacherReviewSection from "../(teacherComponents)/TeachertaskAction";
 
 import { Task, Role } from "@/types/taskRelatedTypes";
-import { p } from "framer-motion/client";
+
+// /store operations and functions!!
+import { setTasks,addTask,deleteTask } from "@/store/slices/classRoomSlice";
+import { useAppDispatch,useAppSelector } from "@/store/hook";
+
+import { useSocket } from "@/lib/socket/socketProvider";
 
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -25,11 +30,12 @@ const formatDate = (iso?: string | null) =>
 
 /* ----------------- Component ---------------- */
 const TaskComponent = ({ classId }: { classId: string }) => {
+  const dispatch=useAppDispatch();
+  const tasks=useAppSelector((store)=>store.classroom.tasks)
   const { isLoaded, user } = useUser();
   const role: Role = (user?.unsafeMetadata?.role as Role) ?? "STUDENT";
   const userId = user?.id ?? "";
 
-  const [tasks, setTasks] = useState<Task[]>([]);
   const [isTaskLoaded, setTaskLoaded] = useState(false);
   const [showForm, setShowForm] = useState(false);
 
@@ -40,13 +46,49 @@ const TaskComponent = ({ classId }: { classId: string }) => {
   const [dueDate, setDueDate] = useState("");
   const [file, setFile] = useState<File | null>(null);
 
+
+  // socket for the RealTime Updatioon of task of the ClassRoom!!!
+  const {socket}=useSocket();
+  
+  useEffect(()=>{
+    if(!socket || !classId)
+      return;
+
+    // real time task addition and deletion!!!
+    const handleAddTask=(data:{classId:string,senderId:string,task:Task})=>{
+      if(classId!=data.classId || data.senderId==user?.id)
+        return;
+      console.log("New Task from Socket:",data);
+      dispatch(addTask(data.task));
+    };
+
+    const handleDeleteTask=(data:{classId:string,senderId:string,taskId:string})=>{
+      if(classId!=data.classId || data.senderId==user?.id)
+        return;
+      console.log("Task Deleted from Socket:",data);
+      dispatch(deleteTask({taskId:data.taskId} as Task));
+    }
+
+
+    // socket for actionsss
+    socket.on("addTask",handleAddTask);
+    socket.on("deleteTask",handleDeleteTask);
+
+    return()=>{
+      socket.off("addTask",handleAddTask);
+      socket.off("deleteTask",handleDeleteTask);
+    }
+
+  },[socket,classId,user,dispatch]);
+
+  // Fetch tasks
   useEffect(() => {
     async function fetchTasks() {
       if (!user) return;
       try {
         const res= await axios.get(`${API_URL}/task/get/${classId}/${user.id}`);
         const data = res.data as {msg:string,tasks:Task[]};
-        setTasks(data.tasks);
+        dispatch(setTasks(data.tasks));
         console.log("Task fetched:", res.data);
       } catch (err) {
         console.log(err);
@@ -79,7 +121,7 @@ const TaskComponent = ({ classId }: { classId: string }) => {
       console.log("Task created:",res.data);
 
       const data =res.data as {msg:string,task:Task};
-      setTasks((prev)=>[data.task,...prev]);
+      dispatch(addTask(data.task))
       toast.success("Task Created Successfully");
 
     } catch (err) {
@@ -93,7 +135,6 @@ const TaskComponent = ({ classId }: { classId: string }) => {
       setFile(null);
     }
 
-    setTasks((prev) => [...prev]);
     setShowForm(false);
 
   };
@@ -112,7 +153,9 @@ const TaskComponent = ({ classId }: { classId: string }) => {
     try {
       const res= await axios.delete(`${API_URL}/task/delete/${taskId}/${userId}/${classId}`);
       console.log("Task deleted:",res.data);
-      setTasks((prev)=>prev.filter((t)=>t.taskId!==taskId));
+
+      dispatch(deleteTask({taskId:taskId} as Task));
+
       toast.success("Task Deleted Successfully");
     } catch (error) {
       console.error("Error deleting task:", error);

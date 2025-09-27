@@ -1,6 +1,7 @@
 
 import { Request,RequestHandler,Response } from "express";
 import prisma from "../prisma";
+import { connected } from "process";
 
 // model TaskSubmission{
 //   submissionId String @id @default(uuid())
@@ -75,6 +76,7 @@ export const SubmitTaskController:RequestHandler = async (req:Request<{},{},Task
                 remark:remark || ""
             }
         });
+        console.log("New Submission:",newSubmission);
         res.status(201).json({msg:"Submission added successfully",submission:newSubmission});
         return;
     } catch (error) {
@@ -85,11 +87,13 @@ export const SubmitTaskController:RequestHandler = async (req:Request<{},{},Task
 };
 
 
-export const ReviewSubmissionController:RequestHandler = async (req:Request<{},{},{submissionId:string,review:string,score:number}>,res:Response)=>{
+export const ReviewSubmissionController:RequestHandler = async (req:Request<{},{},{submissionId:string,review:string,score:number,userId:string}>,res:Response)=>{
     try {
-        const {submissionId,review,score} = req.body;
+        const {submissionId,review,score,userId} = req.body;
+        console.log(req.body);
+        console.log(submissionId,review,score,userId);
         // Validate input
-        if(!submissionId || !review || score===undefined){
+        if(!submissionId || !review || score===undefined || !userId){
             res.status(400).json({msg:"Missing required fields"});
             return;
         }
@@ -104,6 +108,19 @@ export const ReviewSubmissionController:RequestHandler = async (req:Request<{},{
         });
         if(!submission){
             res.status(404).json({msg:"Submission not found"});
+            return;
+        }
+
+        // check if user is the teacher of the task
+        const task = await prisma.task.findUnique({
+            where:{taskId:submission.taskId}
+        });
+        if(!task){
+            res.status(404).json({msg:"Task not found"});
+            return;
+        }
+        if(task.teacherId !== userId){
+            res.status(403).json({msg:"You are not authorized to review this submission"});
             return;
         }
 
