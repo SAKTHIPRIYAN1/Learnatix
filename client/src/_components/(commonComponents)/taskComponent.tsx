@@ -302,14 +302,14 @@ const TaskComponent = ({ classId }: { classId: string }) => {
             </div>
 
             {role === "STUDENT" && (!isPastDue(task.dueDate) ?(
-              <StudentTaskActions task={task} currentUserId={userId} />
+              <StudentTaskActions taskId={task.taskId} currentUserId={userId} />
             )
             : <p className="text-sm text-red-400 font-medium mt-2">
                Due Date Passed!
             </p>)
             }
             {role === "TEACHER" && (
-              <TeacherReviewSection task={task} userId={userId} />
+              <TeacherReviewSection taskId={task.taskId}  userId={userId} />
             )}
           </div>
         ))

@@ -4,7 +4,6 @@ export type Role = "TEACHER" | "STUDENT" | string;
 export type Submission = {
   submissionId: string;
   studentId: string;
-  studentName?: string;
   student?:{name:string};
   filePath: string;
   createdAt: string;

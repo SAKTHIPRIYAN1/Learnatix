@@ -44,11 +44,12 @@ interface chatMessage{
     message:string,
     senderId:string,
     senderName:string,
-    classRoomId:string
+    classRoomId:string,
+    role:"TEACHER" | "STUDENT"
 }
 export const SendMessageController:RequestHandler = async(req:Request<{},{},chatMessage>,res:Response)=>{
     try{
-        const {message,senderId,senderName,classRoomId}=req.body;
+        const {message,senderId,senderName,classRoomId,role}=req.body;
 
         
         console.log(req.body);
@@ -68,9 +69,9 @@ export const SendMessageController:RequestHandler = async(req:Request<{},{},chat
 
         // transmitting to the socket to classRoom...
         const io = getIO();
-        io.to(classRoomId).emit('newMessage',{ senderId,senderName,message,classRoomId });
+        io.to(classRoomId).emit('newMessage',{ chatId:insertedChat.chatId,senderId,senderName,message,classRoomId,sender:{role} });
         // console.log(insertedChat);
-        res.status(200).json({msg:"Message Sent",data:insertedChat});
+        res.status(200).json({msg:"Message Sent",chat:{chatId:insertedChat.chatId,senderId,senderName,message,classRoomId,sender:{role}}});
         return;
     }
     catch(err){

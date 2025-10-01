@@ -28,17 +28,19 @@ const ChatPage = ({classRoomId}:{classRoomId:string}) => {
 
   // socket Function for the classRoom function and operations!!!!
   useEffect(() => {
-    if (!socket || !classRoomId) return;
+    if (!socket || !classRoomId || !user) return;
     console.log("from ChatPage:",classRoomId);
 
     // for fetching new Messages!!!
     const handleNewMessage = (data: any) => {
       console.log("New message:", data);
-      console.log(classRoomId,data.classRoomId);
-      if(classRoomId==data.classRoomId && user?.id !=data.senderId){
-        console.log("adding New MEssages");
-        dispatch(addChatMessage(data))
+      console.log(user?.id , data.senderId,user?.id==data.senderId);
+      if(classRoomId!=data.classRoomId || user?.id==data.senderId){
+        return ;
       }
+
+      console.log("adding New MEssages");
+      dispatch(addChatMessage(data))
     };
 
     // for handling new Messages in the Group
@@ -49,7 +51,7 @@ const ChatPage = ({classRoomId}:{classRoomId:string}) => {
       socket.off("newMessage", handleNewMessage);
     };
     
-  }, [socket, classRoomId]);
+  }, [socket, classRoomId,user]);
 
 
 

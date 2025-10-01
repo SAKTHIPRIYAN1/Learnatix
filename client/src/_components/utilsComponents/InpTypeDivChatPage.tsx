@@ -14,6 +14,7 @@ import { useSocket } from "@/lib/socket/socketProvider";
 import { useAppDispatch,useAppSelector } from "@/store/hook";
 import { addChatMessage } from "@/store/slices/classRoomSlice";
 import { useUser } from "@clerk/clerk-react";
+import { ChatMessage } from "@/types/classRoom";
 const API_URL=process.env.NEXT_PUBLIC_BACKEND_URL;
 
 type TyperDivProps = {
@@ -68,9 +69,12 @@ const InpTypeDivChatPage = ({ scrollfunc }: TyperDivProps) => {
         message,
         senderId:user? user.id :"Myid",
         senderName:name? name :"Unknown",
-        classRoomId
+        classRoomId,
+        role:user?.unsafeMetadata.role || "STUDENT"
       });
-
+      const data=res.data as {msg:string,chat:ChatMessage};
+      // adding the message to the store directly from here only!!!
+      dispatch(addChatMessage(data.chat));
       console.log("Result of the sending:",res.data);
     }catch(err){
       console.log(err);

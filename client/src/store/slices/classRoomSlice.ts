@@ -1,8 +1,7 @@
 
 import { createSlice,PayloadAction } from "@reduxjs/toolkit";
 import {ClassRoomOptions, ChatMessage,Note} from "@/types/classRoom";
-import { Task } from "@/types/taskRelatedTypes";
-import { act } from "react";
+import { Submission, Task } from "@/types/taskRelatedTypes";
 
 
 interface initialStateTyp{
@@ -61,12 +60,55 @@ const ClassRoomSlice = createSlice(
                 state.tasks=state.tasks.filter((t)=>t.taskId!==action.payload.taskId);
             },
 
+
+            // for task Submission part
+            setTaskSubmission:(state,action:PayloadAction<{taskId:string,submission:Submission}>)=>{
+                const {taskId,submission}=action.payload;
+                const taskIndex=state.tasks.findIndex((t)=>t.taskId===taskId);
+                
+                if (taskIndex !== -1 && submission) {
+        // Ensure submission is always an array
+                    if (!state.tasks[taskIndex].submission) {
+                        state.tasks[taskIndex].submission = [];
+                    }
+                    // Create a new array reference
+                    state.tasks[taskIndex].submission = [
+                        ...state.tasks[taskIndex].submission,
+                        submission,
+                    ];
+                }
+                console.log("After Submission",state.tasks[taskIndex]);
+            },
+
+
+            // for teacher review part of the submission
+            setReviewSubmission:(state,action:PayloadAction<{taskId:string,submission:Submission}>)=>{
+                const {taskId,submission}=action.payload;
+                const taskIndex=state.tasks.findIndex((t)=>t.taskId===taskId);
+                
+                if (taskIndex !== -1 && submission) {
+            // Ensure submission is always an array
+                    if (!state.tasks[taskIndex].submission) {
+                        state.tasks[taskIndex].submission = [];
+                    }
+                    // Create a new array reference
+                    state.tasks[taskIndex].submission = state.tasks[taskIndex].submission.map((sub)=>{
+                        if(sub.submissionId===submission.submissionId){
+                            return submission;
+                        }
+                        return sub;
+                    });
+                }
+                console.log("After Review Submission",state.tasks[taskIndex]);
+             }
         }
     }
 );
 
 
-export const {setActiveTab,addChatMessage,setClassChats,setNotes,addNote,deleteNote
+export const {setActiveTab,addChatMessage,setClassChats,
+    setNotes,addNote,deleteNote
     ,addTask,deleteTask,setTasks
+    ,setTaskSubmission,setReviewSubmission
 } =ClassRoomSlice.actions;
 export default ClassRoomSlice.reducer;

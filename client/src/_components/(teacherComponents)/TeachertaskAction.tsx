@@ -3,9 +3,16 @@
 import React, {  useEffect, useState } from "react";
 import {  Download } from "lucide-react";
 import toast from "react-hot-toast";
-import {Task } from "@/types/taskRelatedTypes";
+import {Submission, Task } from "@/types/taskRelatedTypes";
 import axios from "axios";
-import { form } from "framer-motion/client";
+
+import { useSocket } from "@/lib/socket/socketProvider";
+import { useAppDispatch } from "@/store/hook";
+
+import { RootState } from "@/store/store";
+
+import { setTaskSubmission } from "@/store/slices/classRoomSlice";
+import { useSelector } from "react-redux";
 
 const API_URL=process.env.NEXT_PUBLIC_BACKEND_URL;
 /* ---------------------- Helpers ------------------------ */
@@ -17,13 +24,41 @@ const formatDate = (iso?: string | null) => {
 
 
 /* ---------------- Teacher Review Subcomponent ---------------- */
-const TeacherReviewSection = ({ task,userId }: { task: Task,userId:string }) => {
+const TeacherReviewSection = ({ taskId,userId }: { taskId: string,userId:string }) => {
   const [expanded, setExpanded] = useState(false);
   const [score,setScore]=useState<number>(0);
   const [review,setReview]=useState<string>("");
   const [isReviwed,setIsReviwed]=useState<boolean>(false);
 
+  const task = useSelector((state: RootState) =>
+    state.classroom.tasks.find((t) => t.taskId === taskId)
+  );
+
   console.log(task);
+  const dispatch=useAppDispatch();
+
+  const {socket}=useSocket();
+    
+    useEffect(()=>{
+      if(!socket || !task)
+        return;
+      
+      const handleNewSubmission=(data:{taskId:string,submission:Submission})=>{
+        console.log("New Submission Received via socket:",data);
+        if(data.taskId===task.taskId){
+          console.log("Dispatching to store");  
+          dispatch(setTaskSubmission(data));
+        }
+      }
+
+     socket.on("newSubmission",handleNewSubmission);
+
+     return()=>{
+      socket.off("newSubmission",handleNewSubmission);
+     }
+    
+
+    },[socket,task]);
 
   const handleReviewSubmit = async (submissionId:string) => {
     console.log("Teacher Reviewed!!!");
@@ -60,8 +95,8 @@ const TeacherReviewSection = ({ task,userId }: { task: Task,userId:string }) => 
       // Clear form and close the review section
       // make the form Disappear and show the updated review
       setScore(score);
-      setReview("");
-      setExpanded(false); 
+      setReview(review);
+      setExpanded(false);
 
       // Make the socket Connection and update Value here ...
 
@@ -76,6 +111,9 @@ const TeacherReviewSection = ({ task,userId }: { task: Task,userId:string }) => 
 
   };
 
+  // for socket real time updating the Review and Submission Section!!!
+  
+
 
   return (
     <div className="mt-4">
@@ -89,7 +127,7 @@ const TeacherReviewSection = ({ task,userId }: { task: Task,userId:string }) => 
 
       {expanded && (
         <div className="mt-3 space-y-3">
-          {task.submission && task.submission.length > 0 ? (
+          { task && task.submission && task.submission.length > 0 ? (
             task.submission.map((s,idx) => (
               // actual task of the sudent!!!
               <div
@@ -100,7 +138,7 @@ const TeacherReviewSection = ({ task,userId }: { task: Task,userId:string }) => 
                 <div className="flex justify-between mb-3">
                   <div>
                     <div className="text-sm font-medium text-slate-300">
-                      {s.student?.name ?? s.studentId}
+                      {s.student?.name ||   s.studentId}
                     </div>
                     <div className="text-xs text-slate-400 mt-1">{s.remark}</div>
                     {s.filePath && (

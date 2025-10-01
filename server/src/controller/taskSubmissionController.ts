@@ -1,25 +1,7 @@
 
 import { Request,RequestHandler,Response } from "express";
 import prisma from "../prisma";
-import { connected } from "process";
-
-// model TaskSubmission{
-//   submissionId String @id @default(uuid())
-//   createdAt DateTime @default(now())
-//   remark String @default("")
-//   review String @default("")
-//   score Int @default(0) 
-//   filePath String
-
-// // task Relation with the submission!!!
-//   taskId String
-//   task Task @relation(fields: [taskId],references: [taskId])
-
-//   studentId String
-//   student Users @relation(fields: [studentId],references: [clerkId])
-//   @@index([taskId])
-//   @@index([studentId])
-// }
+import { getIO } from "../socket";
 
 interface TaskSubmission{
     taskId:string,
@@ -49,8 +31,9 @@ export const SubmitTaskController:RequestHandler = async (req:Request<{},{},Task
 
 
         // Check if student exists
-        const student = await prisma.users.findUnique({
-            where:{clerkId:studentId,role:"STUDENT"}
+        const student = await prisma.classRoomParticipant.findFirst({
+            where:{userId:studentId,role:"STUDENT",roomId:task.classId},
+            include:{user:true}
         });
         if(!student){
             res.status(404).json({msg:"Student not found"});
@@ -77,6 +60,11 @@ export const SubmitTaskController:RequestHandler = async (req:Request<{},{},Task
             }
         });
         console.log("New Submission:",newSubmission);
+
+        // sending via socket for the real time updatin!!!
+        const io = getIO();
+        io.to(task.classId).emit("newSubmission",{taskId,submission:{...newSubmission ,student:{name:student.user.name}}});
+
         res.status(201).json({msg:"Submission added successfully",submission:newSubmission});
         return;
     } catch (error) {
@@ -132,6 +120,10 @@ export const ReviewSubmissionController:RequestHandler = async (req:Request<{},{
                 score
             }
         });
+
+        // sending via socket for the real time updatin!!!
+        const io = getIO();
+        io.to(task.classId).emit("newReview",{taskId:task.taskId,submission:{...updatedSubmission}});
 
         res.status(200).json({msg:"Submission reviewed successfully",submission:updatedSubmission});
         return;

@@ -229,8 +229,8 @@ const NotesPage = ({ classId }: { classId: string }) => {
 
               {/* File info */}
               <div className="flex flex-col">
-                <span className="font-medium">{note.name}</span>
-                <span className="text-sm text-slate-400">{note.description}</span>
+                <span className="font-medium">{note.description}</span>
+                <span className="text-sm text-slate-400">{note.name}</span>
                 <a
                   href={API_URL+'/uploads/'+note.notesPath}
                   target="_blank"
