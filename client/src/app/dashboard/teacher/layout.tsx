@@ -1,8 +1,7 @@
 
 import Sidebar from "@/_components/utilsComponents/sidebar";
 import Header from "@/_components/utilsComponents/header";  
-import {IconBell,IconStudent } from "@/_components/(Icons)/Icons";
-import { IconNotebook } from "@/_components/(Icons)/bookIcon";
+import {IconBell,IconGraph,IconStudent } from "@/_components/(Icons)/Icons";
 import { IconSettings } from "@/_components/(Icons)/Icons";
 import HistoryNavigation from "@/_components/utilsComponents/historyNavigation";
 import CreateClassRoomComp from "@/_components/(teacherComponents)/createClassRoom";
@@ -10,7 +9,7 @@ import CreateClassRoomComp from "@/_components/(teacherComponents)/createClassRo
 const TeacherDashboardLinks = [
  
   { name: "Classroom", href: "/dashboard/teacher/classroom", icon: <IconStudent /> },
-  { name: "Quizzes", href: "/dashboard/teacher/quizzes", icon: <IconNotebook /> },
+  { name: "Analytics", href: "/dashboard/teacher/analytics", icon: <IconGraph /> },
   { name: "Notifications", href: "/dashboard/teacher/notification", icon: <IconBell /> },
   {name:"Settings",href:"/dashboard/teacher/classroom",icon:<IconSettings />}
 ];

@@ -6,6 +6,7 @@ import crypto from "crypto";
 
 import { hashString } from "../helperFunctions/bycryptFunctions";
 import { ClassRoom, Users } from '../prisma/prisma/index';
+import { getIO } from "../socket";
 
 
 type createClassBody={
@@ -64,16 +65,43 @@ try{
                 }
             },
             include: {
-            participants: true, //  return participants too
+            participants: true,
+            inviteToken:true //  return participants too
             },
         });
 
+        const newClassRoom=await prisma.classRoom.findUnique(
+            {
+                where:{
+                    roomId:classRoom.roomId
+                },
+                include:{
+                                participants:{
+                                    include:{
+                                        user:true
+                                    }
+                                },
+                                inviteToken:true
+                }
+            }
+        );
+
+        const teachers = newClassRoom?.participants.filter((p) => p.role === "TEACHER");
+        const filteredClassRoom={
+            roomId: classRoom.roomId,
+            name: classRoom.className,
+            description: classRoom.description,
+            teachers,
+            pic:classRoom.filePath,
+            inviteToken:classRoom.inviteToken[0]
+        };
 
         res.status(201).json({
             msg: "Classroom created successfully",
-            classRoom,
-            magicSpell:token,
+            classRoom:filteredClassRoom,
+            magicspell:token
         });
+
         return;
     } catch (error) {
     console.error("Error creating classroom:", error);
@@ -186,37 +214,35 @@ export const joinClassRoom:RequestHandler=async(req:Request<{},{},{
             include:{
                 room:true
             }
-        });
-
-    const classDetails=await prisma.classRoom.findUnique({
-        where:{roomId:tokenDetails.classId},
-        include:{
-            participants:{
-                include:{
-                    user:true
-                }
-            },
-        }
     });
-        if (!classDetails) {
-            throw new Error("Class not found");
-        }
 
-        // Separate teachers and students
-        const teachers = classDetails.participants.filter((p) => p.role === "TEACHER");
-        const students = classDetails.participants.filter((p) => p.role === "STUDENT");
+     const newClassRoom=await prisma.classRoom.findUnique(
+            {
+                where:{
+                    roomId:tokenDetails.classId
+                },
+                include:{
+                                participants:{
+                                    include:{
+                                        user:true
+                                    }
+                                },
+                                inviteToken:true
+                }
+            }
+        );
 
-        // Final filtered object
-        const filteredClassRoom = {
-            roomId: classDetails.roomId,
-            name: classDetails.className,
-            description: classDetails.description,
+        const teachers = newClassRoom?.participants.filter((p) => p.role === "TEACHER");
+        const filteredClassRoom={
+            roomId: newClassRoom?.roomId,
+            name: newClassRoom?.className,
+            description: newClassRoom?.description,
             teachers,
-            pic: classDetails.filePath,
-            
+            pic:newClassRoom?.filePath,
+            inviteToken:newClassRoom?.inviteToken[0]
         };
 
-        res.status(200).json({msg:"Added to the Class",filteredClassRoom});
+        res.status(200).json({msg:"Added to the Class",classRoom:filteredClassRoom});
         return;
 
     }
@@ -283,5 +309,75 @@ export const AlterSharing:RequestHandler=async(req:Request<{},{},{
                 return;
             }
 }
+
+export const DeleteClassController = async (req:Request<{classId:string,userId:string},{},{}>,res:Response)=>{
+    try {
+        const {userId,classId} = req.params;
+        // Check if user is a teacher in the class
+        const user = await prisma.classRoomParticipant.findFirst({
+            where:{userId,role:"TEACHER",roomId:classId}
+        });
+
+        if(!user){
+            res.status(404).json({msg:"User not found"});
+            return;
+        }
+
+
+       const delClass=await prisma.classRoom.delete({
+        where:{
+            roomId:classId
+        }
+       })
+        
+        // sending through the Socket!!!
+        // const io=getIO();
+        // io.to(classId).emit("delClass",classId);
+
+        res.status(200).json({msg:"Task deleted successfully"});
+        return;
+
+    } catch (error:any) {
+        console.error("Error deleting ClassRoom:", error);
+        res.status(500).json({msg:error.message || "Internal server error" });
+        return;
+    }
+};
+
+export const LeaveClassController = async (req:Request<{classId:string,userId:string},{},{}>,res:Response)=>{
+    try {
+        const {userId,classId} = req.params;
+
+        // Check if user is a participant in the class
+        const userPart = await prisma.classRoomParticipant.findFirst({
+            where:{userId,roomId:classId}
+        });
+
+        if(!userPart){
+            res.status(404).json({msg:"User not found"});
+            return;
+        }
+
+      
+       const delClassPart=await prisma.classRoomParticipant.delete({
+        where:{
+            id:userPart?.id
+        }
+       });
+        
+        // sending through the Socket!!!
+        // const io=getIO();
+        // io.to(classId).emit("delClass",classId);
+
+        res.status(200).json({msg:"Leaved successfully"});
+        return;
+
+    } catch (error:any) {
+        console.error("Error deleting ClassRoom:", error);
+        res.status(500).json({msg:error.message || "Internal server error" });
+        return;
+    }
+};
+
 
 export default createClassRoom;

@@ -3,9 +3,14 @@ import { useState } from "react";
 import { useUser } from "@clerk/clerk-react";
 import axios from "axios";
 
+import { useAppDispatch } from "@/store/hook";
+import { addClassRoom } from "@/store/slices/usesrSlice";
+
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 import toast from "react-hot-toast";
+import { ClassRoomResponse } from '../../types/classRoom';
+
 
 type FormType = {
   userId: string;
@@ -15,8 +20,10 @@ type FormType = {
 const JoinClassRoomComp = () => {
   const { user } = useUser();
   const [showForm, setShowForm] = useState(false);
-  
-//   form data useState!!!
+  const dispatch=useAppDispatch();
+
+
+// form data useState!!!
   const [formData, setFormData] = useState<FormType>({
     userId: "",
     magicSpell:""
@@ -53,7 +60,12 @@ const JoinClassRoomComp = () => {
         magicSpell:formData.magicSpell
       });
       console.log(res);
+      
+
+      const data= res.data as {msg:string,classRoom:ClassRoomResponse};
+      dispatch(addClassRoom(data.classRoom));
       toast.success("Joined ClassRoom !");
+      
       // reset and close
       setFormData({
         userId: "",

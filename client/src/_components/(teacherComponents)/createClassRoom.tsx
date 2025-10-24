@@ -3,6 +3,10 @@ import { useState } from "react";
 import { useUser } from "@clerk/clerk-react";
 import axios from "axios";
 
+import { useAppDispatch } from "@/store/hook";
+import { addClassRoom } from "@/store/slices/usesrSlice";
+import { ClassRoomResponse } from "@/types/classRoom";
+
 const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 import toast from "react-hot-toast";
@@ -32,7 +36,8 @@ const CreateClassRoomComp = () => {
       [field]: value,
     }));
   };
-
+  
+  const dispatch = useAppDispatch();
 
   const CreateClassRoom = async () => {
     
@@ -58,6 +63,17 @@ const CreateClassRoomComp = () => {
       
       const res = await axios.post(API_URL+"/class/create",body);
       toast.success("ClassRoom Created!");
+
+      const data = res.data as {
+        msg: string;
+        classRoom: ClassRoomResponse;
+        magicSpell: string;
+      };
+
+      console.log(data.classRoom);
+      // add to the store!!!
+      dispatch(addClassRoom(data.classRoom));
+      // console.log(data);
       // reset and close
       setFormData({
         className: "",
@@ -142,7 +158,7 @@ const CreateClassRoomComp = () => {
                     handleChange("file", e.target.files ? e.target.files[0] : "")
                   }
                   className="w-full text-sm text-slate-200 file:mr-3 file:py-1 file:px-3 
-                    file:rounded-md file:border-0 file:bg-blue-500 file:text-white hover:file:bg-blue-600"
+                    file:rounded-md file:border-0 file:bg-blue-500 cursor-pointer file:text-white hover:file:bg-blue-600"
                 />
               </div>
 
@@ -153,7 +169,7 @@ const CreateClassRoomComp = () => {
                   value={formData.description}
                   onChange={(e) => handleChange("description", e.target.value)}
                   className="w-full px-3 py-2 rounded-lg bg-slate-950/20 border border-slate-400/40 
-                    focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    focus:outline-none  focus:ring-1 focus:ring-blue-500"
                 />
               </div>
 

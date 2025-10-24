@@ -81,7 +81,7 @@ return (
     </Link>
 
       <h3 className="text-sm text-slate-300 mt-1 line-clamp-2">
-        {props.teachers[0].user.name}
+        {props.teachers[0].user?.name  }
       </h3>
       <h4 className="text-sm text-slate-400 mt-2 line-clamp-2 ">
         {props.description}
@@ -100,7 +100,7 @@ return (
   </div>
 
   {/* Icons Section */}
-  <ClassRoomCardIconDiv baseUrl={props.basePath+'/'+props.roomId } isSharing={isSharing} user={user} handleSharing={handleSharing}  />
+  <ClassRoomCardIconDiv classId={props.roomId} baseUrl={props.basePath+'/'+props.roomId } isSharing={isSharing} user={user} handleSharing={handleSharing}  />
 </div>
 
   );

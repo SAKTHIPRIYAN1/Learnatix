@@ -32,6 +32,7 @@ const ClassRoomSlice = createSlice(
                 state.chatMessages=action.payload;
             },
             addChatMessage:(state,action:PayloadAction<ChatMessage>)=>{
+            
                 state.chatMessages.push(action.payload);
             },
 

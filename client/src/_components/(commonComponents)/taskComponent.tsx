@@ -168,7 +168,7 @@ const TaskComponent = ({ classId }: { classId: string }) => {
   if (!isLoaded) return <h1>Loading…</h1>;
 
   return (
-    <div className="p-6 space-y-6 text-slate-200">
+    <div className="p-6 space-y-6 text-slate-200 ">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-slate-300">Tasks</h2>
 
@@ -260,7 +260,7 @@ const TaskComponent = ({ classId }: { classId: string }) => {
           ) : (tasks.map((task) => (
           <div
             key={task.taskId}
-            className={`p-4 rounded-xl bg-slate-800/30 border ${
+            className={`p-4 rounded-xl bg-slate-800/30 border cursor-pointer hover:border-slate-500 hover ${
               isPastDue(task.dueDate) && role === "STUDENT"
                 ? "border-red-500/50"
                 : "border-slate-700/30"

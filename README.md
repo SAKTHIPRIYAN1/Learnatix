@@ -1,1 +1,2 @@
-This is the App called Quizzy. This utilizes gen AI and generate the Quizz in real time.
+Developing a Google Classroom style platform with task & classroom management, designing PostgreSQL schemas, and building microservice backend with asynchronous processing via RabbitMQ.
+Implementing AI-powered evaluation with a RAG pipeline for task scoring, feedback, and analytics; developing AI-driven auto task generation.
