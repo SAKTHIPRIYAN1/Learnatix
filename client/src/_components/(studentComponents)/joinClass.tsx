@@ -75,7 +75,11 @@ const JoinClassRoomComp = () => {
       setShowForm(false);
 
     } catch (err) {
-      const data= err as {response:{data:{msg:string}}}
+      const data= err as {response:{data:{msg:string}}};
+      setFormData({
+        userId: "",
+        magicSpell:""
+      });
       toast.error(data.response.data.msg);
     }
   };

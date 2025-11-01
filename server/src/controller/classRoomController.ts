@@ -201,7 +201,9 @@ export const joinClassRoom:RequestHandler=async(req:Request<{},{},{
         });
 
         if(existingParticipant){
-            res.status(200).json({msg:"Already Joined!"});
+            console.log("Already Joined!!")
+            res.status(403).json({msg:"Already Joined in the Class!"});
+            return;
         }
 
     //  adding the joinee to the respected classRoom

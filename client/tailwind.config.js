@@ -13,7 +13,8 @@ module.exports = {
         header:"oklch(96.7% 0.003 264.542)",
         accent: "#00ffff",
         bg: "rgb(3,8,22)",
-        
+         'bg-body': '#0a0a0a',
+        'card': '#1a1a1a',
       },
       keyframes: {
         bubble: {

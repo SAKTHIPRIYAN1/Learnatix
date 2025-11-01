@@ -100,7 +100,7 @@ export default function DashboardClient() {
   }
 
    return (
-    <div className="overflow-y-auto h-full flex gap-12">
+    <div className="overflow-y-auto grid grid-cols-[repeat(auto-fit,minmax(300px,360px))] gap-y-6 gap-x-10  justify-start max-w-[1200px] mx-6">
 
      {enrolledClasses.length > 0 ?
         enrolledClasses.map((c,idx)=>{

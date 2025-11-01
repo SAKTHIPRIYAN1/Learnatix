@@ -8,6 +8,7 @@ import axios from "axios";
 import { useParams } from "next/navigation";
 import { ChatMessage } from "@/types/classRoom";
 import { useUser } from "@clerk/clerk-react";
+import { p } from "framer-motion/client";
 
 
 const API_URL=process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -64,11 +65,16 @@ const ClassRoomChatPageComp=({ reff }: { reff: React.RefObject<HTMLDivElement | 
         >
                 {
                   
-                    chatMessages.map((el,idx)=>{
+                    chatMessages.length>0 ? (
+                      chatMessages.map((el,idx)=>{
                         return(
                             <MessageContainer sender={el.sender} classRoomId={el.classRoomId}  previousSender={idx > 0 ? chatMessages[idx - 1].senderId : undefined} message={el.message} senderId={el.senderId} senderName={el.senderName || el.sender?.name} key={idx} />
                         )
                     })
+                    ):
+                    <div className="w-full justify-center flex ">
+                        <p className=" bg-slate-800 p-1 px-3 rounded-3xl text-slate-400 self-center"> Be first to start interaction!!!</p>
+                    </div>
                 }
     </div>
     )

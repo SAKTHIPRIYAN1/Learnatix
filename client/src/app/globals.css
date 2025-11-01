@@ -6,6 +6,12 @@
   color: whitesmoke;
 }
 
+@layer base{
+  .box-bg{
+    @apply bg-slate-950/30 border border-slate-800 
+  }
+}
+
 @layer utilities{
   :root{
     @apply h-[100vh] w-[100vw] bg-black 
@@ -28,6 +34,8 @@
     75%  { background-position: 100% 0, 0 0, 0 100% }
     100% { background-position: 100% 100%, 0 0, 0 100% }
   }
+
+  
 
 }
 
