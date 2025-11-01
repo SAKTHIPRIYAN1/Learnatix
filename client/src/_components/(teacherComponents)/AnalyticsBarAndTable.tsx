@@ -159,19 +159,19 @@ const GradeDistributionChart = ({
           {
             data: gradeA,
             label: "A (80–100%)",
-            color: "#4ca6ff", // light blue
+            color: "#4ca6ff", 
             stack: "total",
           },
           {
             data: gradeB,
             label: "B (50–79%)",
-            color: "#027af2", // mid blue
+            color: "#027af2",
             stack: "total",
           },
           {
             data: gradeC,
             label: "C (other)",
-            color: "#0059b3", // dark blue
+            color: "#0059b3", 
             stack: "total",
           },
         ]}
@@ -180,12 +180,18 @@ const GradeDistributionChart = ({
         slotProps={{
           tooltip: { trigger: "axis" },
         }}
+
+
+
         sx={{
           "& .MuiChartsLegend-root": { color: "#ccc" },
           "& .MuiChartsAxis-tickLabel": { fill: "#ccc" },
           "& .MuiChartsAxis-line": { stroke: "#444" },
           "& .MuiChartsGrid-line": { stroke: "#333", strokeDasharray: "4" },
         }}
+
+
+
       />
     </div>
   );
