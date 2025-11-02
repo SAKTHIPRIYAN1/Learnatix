@@ -1,7 +1,7 @@
 
 import Sidebar from "@/_components/utilsComponents/sidebar";
 import Header from "@/_components/utilsComponents/header";  
-import { IconGraph,IconBell,IconStudent } from "@/_components/(Icons)/Icons";
+import { IconGraph,IconBell,IconStudent, IconSettings } from "@/_components/(Icons)/Icons";
 import { IconNotebook } from "@/_components/(Icons)/bookIcon";
 import HistoryNavigation from "@/_components/utilsComponents/historyNavigation";
 import JoinClassRoomComp from "@/_components/(studentComponents)/joinClass";
@@ -10,8 +10,8 @@ import JoinClassRoomComp from "@/_components/(studentComponents)/joinClass";
 const studentDashboardLinks = [
   { name: "Classroom", href: "/dashboard/student/classroom", icon: <IconStudent /> },
   { name: "Analytics", href: "/dashboard/student/analytics", icon: <IconGraph /> },
-  { name: "Quizzes", href: "/dashboard/student/quizzes", icon: <IconNotebook /> },
-  { name: "Notifications", href: "/dashboard/student/notification", icon: <IconBell /> },
+  { name: "Notifications", href: "/dashboard/teacher/notification", icon: <IconBell /> },
+  {name:"Settings",href:"/dashboard/teacher/classroom",icon:<IconSettings />}
 ];
 
 export default function RootLayout({

@@ -1,56 +1,30 @@
-"use client";
+// ---------- Student Count Cards Section ----------
 
-import * as React from "react";
+
 import { LineChart } from "@mui/x-charts/LineChart";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
-import DashboardCharts from "@/_components/(teacherComponents)/overallAnalytics/AnalyticsBarAndLine";
-import ChartComp2 from '@/_components/(teacherComponents)/overallAnalytics/AnalyticsTableAndPie';
+import React from "react";
 
-// ---------- Main Analytics Page ----------
-const AnalyticsPage: React.FC = () => {
-  return (
-    <div className="w-full pr-6">
-      <h2 className="text-xl font-semibold mb-4">Overview</h2>
-
-      {/* ---------- Top Section ---------- */}
-      <div className="w-full">
-        <CountCards />
-      </div>
-
-      {/* ---------- Bottom Charts ---------- */}
-      <div className="w-full">
-        <DashboardCharts />
-      </div>
-
-      <div className="w-full">
-        <ChartComp2 />
-      </div>
-    </div>
-  );
-};
-
-export default AnalyticsPage;
-
-const CountCards: React.FC = () => {
+const StudentCountCard: React.FC = () => {
   const data = [
     {
-      title: "Total Active Classrooms",
-      value: "8",
-      change: 12,
-      chartData: [60, 80, 140, 120, 115, 90, 80, 150],
+      title: "Total Active Classes",
+      value: "5",
+      change: 18,
+      chartData: [25, 30, 30, 27, 32, 29, 35, 33, 40, 45], 
     },
     {
-      title: "Total Students Taught",
-      value: "156",
+      title: "Total Tasks Submitted",
+      value: "42",
       change: -5,
-      chartData: [150, 145, 140, 120, 115, 90, 80, 60],
+      chartData: [35, 38, 36, 37, 32, 34, 35, 30, 28, 25], 
     },
     {
-      title: "Avg Task Completion Rate",
-      value: "87%",
+      title: "Avg Score Across Tasks",
+      value: "82%",
       change: 5,
-      chartData: [153, 150, 152, 151, 152, 151, 152, 151],
-    },
+      chartData: [32, 30, 32, 32, 33, 33, 32, 33, 33, 33], 
+    }
   ];
 
   return (
@@ -61,12 +35,12 @@ const CountCards: React.FC = () => {
 
       {/* Insight Card */}
       <div className="min-h-44 p-4 rounded-xl box-bg border border-gray-700/40">
-        <h3 className="text-lg font-semibold text-white">Explore your data</h3>
+        <h3 className="text-lg font-semibold text-white">Explore Your Progress</h3>
         <p className="text-gray-400 text-sm mt-1">
-          Uncover classroom performance and task insights instantly.
+          Dive deeper into your learning insights and task performance.
         </p>
         <button className="mt-4 bg-blue-600 px-3 py-1.5 rounded-lg text-sm hover:bg-blue-700 transition">
-          Get insights
+          View Insights
         </button>
       </div>
     </div>
@@ -74,6 +48,8 @@ const CountCards: React.FC = () => {
 };
 
 // ---------- Individual Count Card ----------
+
+
 interface CountCardItemProps {
   title: string;
   value: string;
@@ -93,8 +69,8 @@ const CountCardItem: React.FC<CountCardItemProps> = ({
     change > 10
       ? "#22c55e"
       : change < 0
-      ? "#ef4444"
-      : "#60a5fa";
+      ? "#ef4444" 
+      : "#60a5fa"; 
 
   const bgColor =
     change > 10
@@ -112,14 +88,13 @@ const CountCardItem: React.FC<CountCardItemProps> = ({
       ? `${change.toFixed(1)}%`
       : `${change.toFixed(1)}%`;
 
-  // Calculate min/max for better visual scaling
+
   const minY = Math.min(...chartData);
   const maxY = Math.max(...chartData);
-   // extra visual space]
   const domain = [minY, maxY];
 
   return (
-    <div className=" hover:border-slate-500 min-h-44 p-4 rounded-xl box-bg border border-gray-700/40">
+    <div className="hover:border-slate-500 min-h-44 p-4 rounded-xl box-bg border border-gray-700/40">
       <p className="text-gray-100 font-semibold text-sm">{title}</p>
 
       <div className="flex justify-between items-center mt-1">
@@ -134,17 +109,17 @@ const CountCardItem: React.FC<CountCardItemProps> = ({
 
       <p className="text-xs mt-1 text-gray-400">Last 30 days</p>
 
-      <div className="mt-4 h-16 w-full "> {/* increased height for better visibility */}
+      <div className="mt-4 h-16 w-full">
         <LineChart
           height={70}
-          width={295}
-          className="ml-[-32px]"
+          width={340}
+          className="ml-[-80px]"
           series={[
             {
               data: chartData,
               color,
               area: true,
-              curve:"linear", // smooth and organic
+              curve: "linear", 
               showMark: false,
             },
           ]}
@@ -152,10 +127,14 @@ const CountCardItem: React.FC<CountCardItemProps> = ({
             {
               min: domain[0],
               max: domain[1],
-              
             },
           ]}
-          xAxis={[{ data: chartData.map((_, i) => i + 1), scaleType: "linear" }]}
+          xAxis={[
+            {
+              data: chartData.map((_, i) => i + 1),
+              scaleType: "linear",
+            },
+          ]}
           margin={{ top: 0, bottom: 5, left: 0, right: 0 }}
           grid={{ horizontal: false, vertical: false }}
           slotProps={{ tooltip: { trigger: "none" } }}
@@ -178,3 +157,5 @@ const CountCardItem: React.FC<CountCardItemProps> = ({
     </div>
   );
 };
+
+export default StudentCountCard;

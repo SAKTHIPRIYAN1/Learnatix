@@ -35,7 +35,7 @@ const ClassPerformanceDashboard: React.FC = () => {
 export default ClassPerformanceDashboard;
 
 /* ---------------- TABLE COMPONENT ---------------- */
-export const PerformanceTable: React.FC<{ selectedCategory: string }> = ({
+ const PerformanceTable: React.FC<{ selectedCategory: string }> = ({
   selectedCategory,
 }) => {
   const [allData, setAllData] = React.useState<
@@ -95,7 +95,7 @@ export const PerformanceTable: React.FC<{ selectedCategory: string }> = ({
   );
 
   return (
-    <div className="box-bg rounded-lg shadow-md overflow-hidden flex flex-col">
+    <div className=" hover:border-slate-500 transition-all box-bg rounded-lg shadow-md overflow-hidden flex flex-col">
       <h2 className="text-lg font-semibold text-zinc-100 p-4 border-b border-zinc-800">
         {selectedCategory} Classrooms
       </h2>
@@ -130,7 +130,7 @@ export const PerformanceTable: React.FC<{ selectedCategory: string }> = ({
             <div className="py-3 px-4">
               <input
                 type="checkbox"
-                className="accent-blue-500 bg-zinc-800 border-zinc-700 rounded"
+                className=" cursor-pointer accent-blue-500 bg-zinc-800 border-zinc-700 rounded"
               />
             </div>
             <div className="py-3 px-4 font-medium text-zinc-200">
@@ -162,7 +162,7 @@ export const PerformanceTable: React.FC<{ selectedCategory: string }> = ({
       <div className="flex justify-end items-center gap-6 p-4 text-sm text-zinc-400 border-t border-zinc-800 mt-auto">
         <div className="flex items-center gap-2">
           <span>Rows per page:</span>
-          <select className="bg-zinc-800 border border-zinc-700 rounded px-2 py-1 text-zinc-300">
+          <select className= " cursor-pointer bg-zinc-800 border border-zinc-700 rounded px-2 py-1 text-zinc-300">
             <option>{rowsPerPage}</option>
           </select>
         </div>
@@ -173,18 +173,18 @@ export const PerformanceTable: React.FC<{ selectedCategory: string }> = ({
         </span>
         <div className="flex gap-2">
           <button
-            className="hover:text-zinc-100 disabled:text-zinc-600"
+            className=" cursor-pointer hover:text-zinc-100 disabled:text-zinc-600"
             disabled={page === 0}
             onClick={() => setPage((p) => Math.max(p - 1, 0))}
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className=" cursor-pointer w-4 h-4" />
           </button>
           <button
-            className="hover:text-zinc-100 disabled:text-zinc-600"
+            className=" cursor-pointer hover:text-zinc-100 disabled:text-zinc-600"
             disabled={page >= totalPages - 1}
             onClick={() => setPage((p) => Math.min(p + 1, totalPages - 1))}
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className=" cursor-pointer w-4 h-4" />
           </button>
         </div>
       </div>
@@ -200,7 +200,7 @@ export const CategoryTree: React.FC<{
   const items = ["Top Performing", "Least Performing", "Most Improved"];
 
   return (
-    <div className="box-bg rounded-lg p-4 shadow-md">
+    <div className=" hover:border-slate-500 box-bg rounded-lg p-4 shadow-md">
       <div className="flex justify-between items-center mb-4">
         <h3 className="font-semibold text-zinc-100">Performance Categories</h3>
         <div className="flex items-center gap-2 text-zinc-400 text-sm">
@@ -253,7 +253,7 @@ export const GradeDistributionChart: React.FC = () => {
   if (gradeData.length === 0) return null;
 
   return (
-    <div className="box-bg rounded-lg p-4 shadow-md relative flex flex-col justify-end">
+    <div className="box-bg hover:border-slate-500 transition-all rounded-lg p-4 shadow-md relative flex flex-col justify-end">
       <h3 className="font-semibold text-zinc-100 mb-4">
         Grade Distribution Across All Classrooms
       </h3>
