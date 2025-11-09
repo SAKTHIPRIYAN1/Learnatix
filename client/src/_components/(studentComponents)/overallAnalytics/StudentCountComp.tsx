@@ -1,30 +1,33 @@
-// ---------- Student Count Cards Section ----------
+"use client"; // ensure this component renders only on the client
 
 
-import { LineChart } from "@mui/x-charts/LineChart";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import React from "react";
 
+import { LineChart } from "@mui/x-charts/LineChart";
+
+
+// ---------- Student Count Cards Section ----------
 const StudentCountCard: React.FC = () => {
   const data = [
     {
       title: "Total Active Classes",
       value: "5",
       change: 18,
-      chartData: [25, 30, 30, 27, 32, 29, 35, 33, 40, 45], 
+      chartData: [25, 30, 30, 27, 32, 29, 35, 33, 40, 45],
     },
     {
       title: "Total Tasks Submitted",
       value: "42",
       change: -5,
-      chartData: [35, 38, 36, 37, 32, 34, 35, 30, 28, 25], 
+      chartData: [35, 38, 36, 37, 32, 34, 35, 30, 28, 25],
     },
     {
       title: "Avg Score Across Tasks",
       value: "82%",
       change: 5,
-      chartData: [32, 30, 32, 32, 33, 33, 32, 33, 33, 33], 
-    }
+      chartData: [32, 30, 32, 32, 33, 33, 32, 33, 33, 33],
+    },
   ];
 
   return (
@@ -48,8 +51,6 @@ const StudentCountCard: React.FC = () => {
 };
 
 // ---------- Individual Count Card ----------
-
-
 interface CountCardItemProps {
   title: string;
   value: string;
@@ -63,14 +64,11 @@ const CountCardItem: React.FC<CountCardItemProps> = ({
   change,
   chartData,
 }) => {
-  const gradientId = React.useId();
+  // Deterministic gradient ID (avoids SSR mismatch)
+  const gradientId = `gradient-${title.replace(/\s+/g, "-").toLowerCase()}`;
 
   const color =
-    change > 10
-      ? "#22c55e"
-      : change < 0
-      ? "#ef4444" 
-      : "#60a5fa"; 
+    change > 10 ? "#22c55e" : change < 0 ? "#ef4444" : "#60a5fa";
 
   const bgColor =
     change > 10
@@ -88,10 +86,11 @@ const CountCardItem: React.FC<CountCardItemProps> = ({
       ? `${change.toFixed(1)}%`
       : `${change.toFixed(1)}%`;
 
-
   const minY = Math.min(...chartData);
   const maxY = Math.max(...chartData);
-  const domain = [minY, maxY];
+
+  const [mounted, setMounted] = React.useState(false);
+  React.useEffect(() => setMounted(true), []);
 
   return (
     <div className="hover:border-slate-500 min-h-44 p-4 rounded-xl box-bg border border-gray-700/40">
@@ -110,49 +109,47 @@ const CountCardItem: React.FC<CountCardItemProps> = ({
       <p className="text-xs mt-1 text-gray-400">Last 30 days</p>
 
       <div className="mt-4 h-16 w-full">
-        <LineChart
-          height={70}
-          width={340}
-          className="ml-[-80px]"
-          series={[
-            {
-              data: chartData,
-              color,
-              area: true,
-              curve: "linear", 
-              showMark: false,
-            },
-          ]}
-          yAxis={[
-            {
-              min: domain[0],
-              max: domain[1],
-            },
-          ]}
-          xAxis={[
-            {
-              data: chartData.map((_, i) => i + 1),
-              scaleType: "linear",
-            },
-          ]}
-          margin={{ top: 0, bottom: 5, left: 0, right: 0 }}
-          grid={{ horizontal: false, vertical: false }}
-          slotProps={{ tooltip: { trigger: "none" } }}
-          sx={{
-            "& .MuiChartsAxis-root": { display: "none" },
-            "& .MuiChartsLegend-root": { display: "none" },
-            "& .MuiAreaElement-root": {
-              fill: `url(#${gradientId})`,
-            },
-          }}
-        >
-          <defs>
-            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="5%" stopColor={color} stopOpacity={0.5} />
-              <stop offset="95%" stopColor={color} stopOpacity={0.0} />
-            </linearGradient>
-          </defs>
-        </LineChart>
+        {/* Render LineChart only on client after mount */}
+        {mounted && (
+          <LineChart
+            height={70}
+            width={340}
+            className="ml-[-80px]"
+            series={[
+              {
+                data: chartData,
+                color,
+                area: true,
+                curve: "linear",
+                showMark: false,
+              },
+            ]}
+            yAxis={[{ min: minY, max: maxY }]}
+            xAxis={[
+              {
+                data: chartData.map((_, i) => i + 1),
+                scaleType: "linear",
+              },
+            ]}
+            margin={{ top: 0, bottom: 5, left: 0, right: 0 }}
+            grid={{ horizontal: false, vertical: false }}
+            slotProps={{ tooltip: { trigger: "none" } }}
+            sx={{
+              "& .MuiChartsAxis-root": { display: "none" },
+              "& .MuiChartsLegend-root": { display: "none" },
+              "& .MuiAreaElement-root": {
+                fill: `url(#${gradientId})`,
+              },
+            }}
+          >
+            <defs>
+              <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor={color} stopOpacity={0.5} />
+                <stop offset="95%" stopColor={color} stopOpacity={0.0} />
+              </linearGradient>
+            </defs>
+          </LineChart>
+        )}
       </div>
     </div>
   );
