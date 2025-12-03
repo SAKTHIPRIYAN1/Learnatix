@@ -1,8 +1,8 @@
 import { Request, Response, RequestHandler } from "express";
 
 import prisma from "../prisma";
-import {Role} from '../prisma/prisma'
 
+import { Role } from "@prisma/client";
 
 interface UserType {
   clerkId: string;

@@ -5,14 +5,16 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../src/prisma/prisma"
+  provider = "prisma-client-js"  // standard Prisma client  // optional custom output
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+
+
 
 model Users {
   clerkId   String   @id @unique
@@ -153,9 +155,6 @@ model TaskSubmission{
   @@index([studentId])
 }
 
-
-
-
 enum Role{
   TEACHER
   STUDENT
@@ -165,5 +164,3 @@ enum TaskType{
   QUIZ
   ASSIGNMENT
 }
-
-

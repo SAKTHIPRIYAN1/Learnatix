@@ -1,10 +1,23 @@
 "use client";
 
 import * as React from "react";
-import { LineChart } from "@mui/x-charts/LineChart";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import DashboardCharts from "@/_components/(teacherComponents)/overallAnalytics/AnalyticsBarAndLine";
-import ChartComp2 from '@/_components/(teacherComponents)/overallAnalytics/AnalyticsTableAndPie';
+import ClassPerformanceDashboard from "@/_components/(teacherComponents)/overallAnalytics/AnalyticsTableAndPie";
+import dynamic from "next/dynamic";
+import { useEffect,useState } from "react";
+import toast from "react-hot-toast";
+import { useUser } from "@clerk/clerk-react";
+import axios from "axios";
+
+
+const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+// Dynamically import LineChart (client-side only)
+const LineChart = dynamic(
+  () => import("@mui/x-charts/LineChart").then((mod) => mod.LineChart),
+  { ssr: false }
+);
 
 // ---------- Main Analytics Page ----------
 const AnalyticsPage: React.FC = () => {
@@ -14,7 +27,7 @@ const AnalyticsPage: React.FC = () => {
 
       {/* ---------- Top Section ---------- */}
       <div className="w-full">
-        <CountCards />
+        <ClassCountCard />
       </div>
 
       {/* ---------- Bottom Charts ---------- */}
@@ -23,7 +36,7 @@ const AnalyticsPage: React.FC = () => {
       </div>
 
       <div className="w-full">
-        <ChartComp2 />
+        <ClassPerformanceDashboard />
       </div>
     </div>
   );
@@ -31,33 +44,94 @@ const AnalyticsPage: React.FC = () => {
 
 export default AnalyticsPage;
 
-const CountCards: React.FC = () => {
-  const data = [
-    {
-      title: "Total Active Classrooms",
-      value: "8",
-      change: 12,
-      chartData: [60, 80, 140, 120, 115, 90, 80, 150],
-    },
-    {
-      title: "Total Students Taught",
-      value: "156",
-      change: -5,
-      chartData: [150, 145, 140, 120, 115, 90, 80, 60],
-    },
-    {
-      title: "Avg Task Completion Rate",
-      value: "87%",
-      change: 5,
-      chartData: [153, 150, 152, 151, 152, 151, 152, 151],
-    },
-  ];
+
+interface ClassCountData {
+  totalActiveClassRoom: number;
+  totalStudent: number;
+  avgScore: number;
+}
+
+type CountType = {
+  title: string;
+  value: string;
+  change: number;
+  chartData: number[];
+};
+
+// ---------- Skeleton Loader ----------
+const SkeletonCard = () => (
+  <div className="min-h-44 p-4 rounded-xl box-bg border border-gray-700/40 animate-pulse">
+    <div className="h-4 bg-gray-700/60 rounded w-1/3 mb-4"></div>
+    <div className="flex justify-between items-center mb-3">
+      <div className="h-6 bg-gray-700/60 rounded w-1/4"></div>
+      <div className="h-5 bg-gray-700/60 rounded w-1/5"></div>
+    </div>
+    <div className="h-3 bg-gray-700/60 rounded w-1/3 mb-3"></div>
+    <div className="h-16 bg-gray-700/60 rounded w-full"></div>
+  </div>
+);
+
+// ---------- Main Component ----------
+const ClassCountCard: React.FC = () => {
+  const { user, isLoaded } = useUser();
+  const [countData, setCountData] = useState<CountType[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchClassCountData = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${API_URL}/analytics/class/countCard/${user?.id}`
+      );
+      const data = res.data as {
+        msg: string;
+        classCountData: ClassCountData;
+      };
+
+      const { totalActiveClassRoom, totalStudent, avgScore } =
+        data.classCountData;
+
+      setCountData([
+        {
+          title: "Total Active Classrooms",
+          value: `${totalActiveClassRoom}`,
+          change: 12,
+          chartData: [60, 70, 80, 90, 85, 88, 95, 100, 110, 120],
+        },
+        {
+          title: "Total Students Taught",
+          value: `${totalStudent}`,
+          change: -3,
+          chartData: [150, 140, 130, 135, 125, 120, 115, 118, 122, 125],
+        },
+        {
+          title: "Avg Task Completion Rate",
+          value: `${avgScore.toFixed(2)}%`,
+          change: 5,
+          chartData: [80, 82, 85, 83, 84, 86, 88, 87, 89, 90],
+        },
+      ]);
+    } catch (err) {
+      console.error(err);
+      const errMsg = err as { message?: string };
+      toast.error(errMsg.message || "Error fetching analytics data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!isLoaded || !user?.id) return;
+    fetchClassCountData();
+  }, [isLoaded, user]);
+
+  const showSkeleton = loading || !isLoaded;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-      {data.map((item, i) => (
-        <CountCardItem key={i} {...item} />
-      ))}
+      {showSkeleton
+        ? Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)
+        : countData.map((item, i) => <CountCardItem key={i} {...item} />)}
 
       {/* Insight Card */}
       <div className="min-h-44 p-4 rounded-xl box-bg border border-gray-700/40">
@@ -74,14 +148,7 @@ const CountCards: React.FC = () => {
 };
 
 // ---------- Individual Count Card ----------
-interface CountCardItemProps {
-  title: string;
-  value: string;
-  change: number;
-  chartData: number[];
-}
-
-const CountCardItem: React.FC<CountCardItemProps> = ({
+const CountCardItem: React.FC<CountType> = ({
   title,
   value,
   change,
@@ -90,11 +157,7 @@ const CountCardItem: React.FC<CountCardItemProps> = ({
   const gradientId = React.useId();
 
   const color =
-    change > 10
-      ? "#22c55e"
-      : change < 0
-      ? "#ef4444"
-      : "#60a5fa";
+    change > 10 ? "#22c55e" : change < 0 ? "#ef4444" : "#60a5fa";
 
   const bgColor =
     change > 10
@@ -106,20 +169,13 @@ const CountCardItem: React.FC<CountCardItemProps> = ({
   const Icon = change > 10 ? TrendingUp : change < 0 ? TrendingDown : Minus;
 
   const changeText =
-    change > 10
-      ? `+${change.toFixed(1)}%`
-      : change < 0
-      ? `${change.toFixed(1)}%`
-      : `${change.toFixed(1)}%`;
+    change > 10 ? `+${change.toFixed(1)}%` : `${change.toFixed(1)}%`;
 
-  // Calculate min/max for better visual scaling
   const minY = Math.min(...chartData);
   const maxY = Math.max(...chartData);
-   // extra visual space]
-  const domain = [minY, maxY];
 
   return (
-    <div className=" hover:border-slate-500 min-h-44 p-4 rounded-xl box-bg border border-gray-700/40">
+    <div className="hover:border-slate-500 min-h-44 p-4 rounded-xl box-bg border border-gray-700/40">
       <p className="text-gray-100 font-semibold text-sm">{title}</p>
 
       <div className="flex justify-between items-center mt-1">
@@ -134,37 +190,29 @@ const CountCardItem: React.FC<CountCardItemProps> = ({
 
       <p className="text-xs mt-1 text-gray-400">Last 30 days</p>
 
-      <div className="mt-4 h-16 w-full "> {/* increased height for better visibility */}
+      <div className="mt-4 h-16 w-full">
         <LineChart
           height={70}
-          width={295}
-          className="ml-[-32px]"
+          width={320}
+          className="ml-[-60px]"
           series={[
             {
               data: chartData,
               color,
               area: true,
-              curve:"linear", // smooth and organic
+              curve: "linear",
               showMark: false,
             },
           ]}
-          yAxis={[
-            {
-              min: domain[0],
-              max: domain[1],
-              
-            },
-          ]}
-          xAxis={[{ data: chartData.map((_, i) => i + 1), scaleType: "linear" }]}
+          yAxis={[{ min: minY, max: maxY }]}
+          xAxis={[{ data: chartData.map((_, i) => i + 1) }]}
           margin={{ top: 0, bottom: 5, left: 0, right: 0 }}
           grid={{ horizontal: false, vertical: false }}
           slotProps={{ tooltip: { trigger: "none" } }}
           sx={{
             "& .MuiChartsAxis-root": { display: "none" },
             "& .MuiChartsLegend-root": { display: "none" },
-            "& .MuiAreaElement-root": {
-              fill: `url(#${gradientId})`,
-            },
+            "& .MuiAreaElement-root": { fill: `url(#${gradientId})` },
           }}
         >
           <defs>

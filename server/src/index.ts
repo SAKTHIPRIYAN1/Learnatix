@@ -16,6 +16,10 @@ import notesRouter from "./router/notesRoute";
 import taskRouter from "./router/taskRoute";
 
 
+// importing the data routes!!!
+import ClassDataRouter from "./router/dataRouters/classDataRoute";
+import StudentDataRouter from "./router/dataRouters/studentDataRoute";
+
 // importing the Socket ..
 import { initSocket } from "./socket";
 
@@ -23,7 +27,7 @@ import { initSocket } from "./socket";
 
 let app=express();
 
-const FrontEndUrl=process.env.FRONTEND_URL || "http://localhost:3000";
+const FrontEndUrl=process.env.FRONTEND_URL || "http://localhost:3000" || "http://learnatix-frontend:3000";
 
 // middlewares...
 app.use(cors({
@@ -50,6 +54,8 @@ app.use('/chat',chatRouter);
 app.use('/participants',participantRouter);
 app.use('/notes',notesRouter);
 app.use('/task',taskRouter);
+app.use('/analytics/class',ClassDataRouter);
+app.use('/analytics/student',StudentDataRouter);
 
 
 

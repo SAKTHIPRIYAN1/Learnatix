@@ -1,40 +1,102 @@
-"use client"; // ensure this component renders only on the client
+"use client";
 
-
+import React, { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { TrendingUp, TrendingDown, Minus } from "lucide-react";
-import React from "react";
+import { useUser } from "@clerk/clerk-react";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { studentCountData } from "../../../types/studentAnalytics";
 
-import { LineChart } from "@mui/x-charts/LineChart";
+// Dynamically import MUI LineChart
+const LineChart = dynamic(
+  () => import("@mui/x-charts/LineChart").then((mod) => mod.LineChart),
+  { ssr: false }
+);
 
+const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+type countType = {
+  title: string;
+  value: string;
+  change: number;
+  chartData: number[];
+};
+
+// ---------- Skeleton Loader ----------
+const SkeletonCard = () => {
+  return (
+    <div className="min-h-44 p-4 rounded-xl box-bg border border-gray-700/40 animate-pulse">
+      <div className="h-4 bg-gray-700/60 rounded w-1/3 mb-4"></div>
+      <div className="flex justify-between items-center mb-3">
+        <div className="h-6 bg-gray-700/60 rounded w-1/4"></div>
+        <div className="h-5 bg-gray-700/60 rounded w-1/5"></div>
+      </div>
+      <div className="h-3 bg-gray-700/60 rounded w-1/3 mb-3"></div>
+      <div className="h-16 bg-gray-700/60 rounded w-full"></div>
+    </div>
+  );
+};
 
 // ---------- Student Count Cards Section ----------
 const StudentCountCard: React.FC = () => {
-  const data = [
-    {
-      title: "Total Active Classes",
-      value: "5",
-      change: 18,
-      chartData: [25, 30, 30, 27, 32, 29, 35, 33, 40, 45],
-    },
-    {
-      title: "Total Tasks Submitted",
-      value: "42",
-      change: -5,
-      chartData: [35, 38, 36, 37, 32, 34, 35, 30, 28, 25],
-    },
-    {
-      title: "Avg Score Across Tasks",
-      value: "82%",
-      change: 5,
-      chartData: [32, 30, 32, 32, 33, 33, 32, 33, 33, 33],
-    },
-  ];
+  const { user, isLoaded } = useUser();
+  const [countData, setCountData] = useState<countType[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchCountCard = async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${API_URL}/analytics/student/countCards/${user?.id}`
+      );
+      const data = res.data as { msg: string; Studentdata: studentCountData };
+      const { totalActiveClasses, totalTasksCompleted, avgScore } =
+        data.Studentdata;
+
+      setCountData([
+        {
+          title: "Total Active Classes",
+          value: "" + totalActiveClasses,
+          change: 18,
+          chartData: [25, 30, 30, 27, 32, 29, 35, 33, 40, 45],
+        },
+        {
+          title: "Total Tasks Submitted",
+          value: "" + totalTasksCompleted,
+          change: -5,
+          chartData: [35, 38, 36, 37, 32, 34, 35, 30, 28, 25],
+        },
+        {
+          title: "Avg Score Across Tasks",
+          value: avgScore + "%",
+          change: 5,
+          chartData: [32, 30, 32, 32, 33, 33, 32, 33, 33, 33],
+        },
+      ]);
+    } catch (err) {
+      console.log(err);
+      const errMsg = err as { message?: string };
+      toast.error(errMsg.message || "Error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    fetchCountCard();
+  }, [isLoaded, user]);
+
+  const showSkeleton = loading || !isLoaded;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-      {data.map((item, i) => (
-        <CountCardItem key={i} {...item} />
-      ))}
+      {showSkeleton
+        ? // --- Skeleton Loader View ---
+          Array.from({ length: 3 }).map((_, i) => <SkeletonCard key={i} />)
+        : // --- Data View ---
+          countData.map((item, i) => <CountCardItem key={i} {...item} />)}
 
       {/* Insight Card */}
       <div className="min-h-44 p-4 rounded-xl box-bg border border-gray-700/40">
@@ -51,24 +113,20 @@ const StudentCountCard: React.FC = () => {
 };
 
 // ---------- Individual Count Card ----------
-interface CountCardItemProps {
-  title: string;
-  value: string;
-  change: number;
-  chartData: number[];
-}
-
-const CountCardItem: React.FC<CountCardItemProps> = ({
+const CountCardItem: React.FC<countType> = ({
   title,
   value,
   change,
   chartData,
 }) => {
-  // Deterministic gradient ID (avoids SSR mismatch)
-  const gradientId = `gradient-${title.replace(/\s+/g, "-").toLowerCase()}`;
+  const gradientId = React.useId();
 
   const color =
-    change > 10 ? "#22c55e" : change < 0 ? "#ef4444" : "#60a5fa";
+    change > 10
+      ? "#22c55e"
+      : change < 0
+      ? "#ef4444"
+      : "#60a5fa";
 
   const bgColor =
     change > 10
@@ -82,15 +140,10 @@ const CountCardItem: React.FC<CountCardItemProps> = ({
   const changeText =
     change > 10
       ? `+${change.toFixed(1)}%`
-      : change < 0
-      ? `${change.toFixed(1)}%`
       : `${change.toFixed(1)}%`;
 
   const minY = Math.min(...chartData);
   const maxY = Math.max(...chartData);
-
-  const [mounted, setMounted] = React.useState(false);
-  React.useEffect(() => setMounted(true), []);
 
   return (
     <div className="hover:border-slate-500 min-h-44 p-4 rounded-xl box-bg border border-gray-700/40">
@@ -109,47 +162,37 @@ const CountCardItem: React.FC<CountCardItemProps> = ({
       <p className="text-xs mt-1 text-gray-400">Last 30 days</p>
 
       <div className="mt-4 h-16 w-full">
-        {/* Render LineChart only on client after mount */}
-        {mounted && (
-          <LineChart
-            height={70}
-            width={340}
-            className="ml-[-80px]"
-            series={[
-              {
-                data: chartData,
-                color,
-                area: true,
-                curve: "linear",
-                showMark: false,
-              },
-            ]}
-            yAxis={[{ min: minY, max: maxY }]}
-            xAxis={[
-              {
-                data: chartData.map((_, i) => i + 1),
-                scaleType: "linear",
-              },
-            ]}
-            margin={{ top: 0, bottom: 5, left: 0, right: 0 }}
-            grid={{ horizontal: false, vertical: false }}
-            slotProps={{ tooltip: { trigger: "none" } }}
-            sx={{
-              "& .MuiChartsAxis-root": { display: "none" },
-              "& .MuiChartsLegend-root": { display: "none" },
-              "& .MuiAreaElement-root": {
-                fill: `url(#${gradientId})`,
-              },
-            }}
-          >
-            <defs>
-              <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={color} stopOpacity={0.5} />
-                <stop offset="95%" stopColor={color} stopOpacity={0.0} />
-              </linearGradient>
-            </defs>
-          </LineChart>
-        )}
+        <LineChart
+          height={70}
+          width={340}
+          className="ml-[-80px]"
+          series={[
+            {
+              data: chartData,
+              color,
+              area: true,
+              curve: "linear",
+              showMark: false,
+            },
+          ]}
+          yAxis={[{ min: minY, max: maxY }]}
+          xAxis={[{ data: chartData.map((_, i) => i + 1) }]}
+          margin={{ top: 0, bottom: 5, left: 0, right: 0 }}
+          grid={{ horizontal: false, vertical: false }}
+          slotProps={{ tooltip: { trigger: "none" } }}
+          sx={{
+            "& .MuiChartsAxis-root": { display: "none" },
+            "& .MuiChartsLegend-root": { display: "none" },
+            "& .MuiAreaElement-root": { fill: `url(#${gradientId})` },
+          }}
+        >
+          <defs>
+            <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor={color} stopOpacity={0.5} />
+              <stop offset="95%" stopColor={color} stopOpacity={0.0} />
+            </linearGradient>
+          </defs>
+        </LineChart>
       </div>
     </div>
   );

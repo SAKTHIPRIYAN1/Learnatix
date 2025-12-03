@@ -1,11 +1,15 @@
 
 import { Request,Response,RequestHandler } from "express";
+
+
 import prisma from "../prisma";
-import { Role } from "../prisma/prisma";
+
+import { Role } from "@prisma/client";
+
 import crypto from "crypto";
 
 import { hashString } from "../helperFunctions/bycryptFunctions";
-import { ClassRoom, Users } from '../prisma/prisma/index';
+
 import { getIO } from "../socket";
 
 
